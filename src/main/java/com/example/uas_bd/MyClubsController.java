@@ -12,8 +12,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
 
-public class ClubsController {
+public class MyClubsController {
 
     @FXML
     private VBox clubsContainer;
@@ -24,17 +25,50 @@ public class ClubsController {
     }
 
     private void loadClubsFromDatabase() {
-        String query = "SELECT * FROM club";
+        String nrp = "c14240058";
 
-        try (Connection conn = DatabaseConnector.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+        try (Connection conn = DatabaseConnector.connect()) {
+            String query = "SELECT id_club FROM keanggotaan WHERE nrp = ?";
+            PreparedStatement ps1 = conn.prepareStatement(query);
+            ps1.setString(1, nrp);
+            ResultSet rs1 = ps1.executeQuery();
 
-            while (rs.next()) {
-                String name = rs.getString("nama_club");
-                String description = rs.getString("deskripsi");
-                int year = rs.getInt("tahun_berdiri");
-                String imagePath = rs.getString("image_path");
+            ArrayList<Integer> clubIDs = new ArrayList<>();
+            while (rs1.next()) {
+                clubIDs.add(rs1.getInt("id_club"));
+            }
+
+            if (clubIDs.isEmpty()) {
+                showNoClubsMessage();
+                return;
+            }
+
+            StringBuilder placeholders = new StringBuilder();
+            for (int i = 0; i < clubIDs.size(); i++) {
+                placeholders.append("?");
+                if (i < clubIDs.size() - 1) {
+                    placeholders.append(",");
+                }
+            }
+
+            String query2 = "SELECT * FROM club WHERE id_club IN (" + placeholders + ")";
+            PreparedStatement ps2 = conn.prepareStatement(query2);
+
+            for (int i = 0; i < clubIDs.size(); i++) {
+                ps2.setInt(i + 1, clubIDs.get(i));
+            }
+
+            ResultSet rs2 = ps2.executeQuery();
+
+            boolean hasClubs = false;
+
+            while (rs2.next()) {
+                hasClubs = true;
+
+                String name = rs2.getString("nama_club");
+                String description = rs2.getString("deskripsi");
+                int year = rs2.getInt("tahun_berdiri");
+                String imagePath = rs2.getString("image_path");
 
                 HBox clubBox = new HBox(10);
                 clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 5; -fx-padding: 10;");
@@ -55,6 +89,10 @@ public class ClubsController {
                 clubBox.getChildren().add(textContainer);
 
                 clubsContainer.getChildren().add(clubBox);
+            }
+
+            if (!hasClubs) {
+                showNoClubsMessage();
             }
 
         } catch (SQLException e) {
@@ -84,5 +122,17 @@ public class ClubsController {
         imageView.setFitWidth(100);
         imageView.setPreserveRatio(true);
         return imageView;
+    }
+
+    private void showNoClubsMessage() {
+        VBox card = new VBox(5);
+        card.setStyle("-fx-border-color: lightgray; -fx-border-radius: 5; -fx-padding: 10;");
+
+        Label messageLabel = new Label("You haven't joined a club.");
+        messageLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: gray;");
+        messageLabel.setWrapText(true);
+
+        card.getChildren().add(messageLabel);
+        clubsContainer.getChildren().add(card);
     }
 }
