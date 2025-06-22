@@ -11,33 +11,42 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, #1e3c72, #2a5298);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #1a1a1a;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView id="loginImg" fitHeight="400.0" fitWidth="300.0" layoutX="311.0" pickOnBounds="true">
+      <ImageView fitHeight="400.0" fitWidth="250.0" layoutX="350.0" pickOnBounds="true">
          <image>
             <Image url="https://sustainability.petra.ac.id/wp-content/uploads/2023/07/DSC03659-scaled.jpg" />
          </image>
       </ImageView>
-      <TextField id="usernameTextField" layoutX="75.0" layoutY="98.0" prefHeight="25.0" prefWidth="150.0" promptText="Username" style="-fx-background-color: Transparent; -fx-background-radius: 0; -fx-border-color: #ffcc4c; -fx-border-width: 0 0 1 0; -fx-border-radius: 0;" />
-      <PasswordField id="passwordTextField" layoutX="75.0" layoutY="151.0" prefHeight="25.0" prefWidth="150.0" promptText="Password" style="-fx-background-radius: 0; -fx-border-width: 0 0 1 0; -fx-border-color: #fad000; -fx-background-color: Transparent;" />
-      <Label id="loginTitleLabel" layoutX="28.0" layoutY="47.0" text="Welcome Back Petranesian" textFill="#ffd417">
+
+      <Label layoutX="50.0" layoutY="40.0" text="Welcome Back!" textFill="#ffffff">
          <font>
-            <Font name="Verdana Bold" size="16.0" />
+            <Font name="Arial Bold" size="18.0" />
          </font>
       </Label>
-      <Button id="signInBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="75.0" layoutY="247.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="150.0" style="-fx-background-color: #0094e8; -fx-text-fill: white; -fx-background-radius: 0; -fx-border-width: 0; -fx-border-color: transparent;" text="Sign in" textAlignment="CENTER" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="15.0" />
-         </font>
-      </Button>
-      <Label id="statusPassLabel" layoutX="75.0" layoutY="177.0" text="Wrong passsword" textFill="#00f2ff">
+
+      <TextField fx:id="usernameTextField" layoutX="50.0" layoutY="90.0" prefWidth="220.0" promptText="Username"
+                 style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-width: 0 0 1 0; -fx-text-fill: white;" />
+
+      <PasswordField fx:id="passwordTextField" layoutX="50.0" layoutY="140.0" prefWidth="220.0" promptText="Password"
+                     style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-width: 0 0 1 0; -fx-text-fill: white;" />
+
+      <ComboBox fx:id="roleComboBox" layoutX="50.0" layoutY="190.0" prefWidth="220.0" promptText="Select Role"
+                style="-fx-background-color: #333333; -fx-text-fill: white;" />
+
+      <Button fx:id="signInBtn" layoutX="50.0" layoutY="250.0" prefWidth="220.0" prefHeight="35.0" text="Sign In"
+              style="-fx-background-color: white; -fx-text-fill: black; -fx-font-weight: bold;" />
+
+      <Label fx:id="statusPassLabel" layoutX="50.0" layoutY="295.0" text="Wrong password" textFill="#ff5555">
          <font>
             <Font size="10.0" />
          </font>
       </Label>
-      <Label id="statusSignIn" alignment="CENTER" contentDisplay="CENTER" layoutX="75.0" layoutY="281.0" text="Username not registered" textFill="#00f2ff" />
-      <Hyperlink id="signUpLink" layoutX="179.0" layoutY="347.0" text="Sign up" textFill="#cdf742" />
-      <Label id="cautionLabel" layoutX="71.0" layoutY="350.0" text="Don't have account?" textFill="#00f2ff" />
-      <ComboBox id="roleComboBox" layoutX="75.0" layoutY="207.0" prefWidth="150.0" promptText="Role" style="-fx-background-color: linear-gradient(to bottom, #1e3c72, #2a5298);" />
+
+      <Label fx:id="statusSignIn" layoutX="50.0" layoutY="310.0" text="Username not found" textFill="#ff5555" />
+
+      <Label layoutX="50.0" layoutY="350.0" text="Don't have an account?" textFill="#cccccc" />
+
+      <Hyperlink fx:id="signUpLink" layoutX="190.0" layoutY="350.0" text="Sign up" textFill="#ffffff" />
    </children>
 </AnchorPane>
