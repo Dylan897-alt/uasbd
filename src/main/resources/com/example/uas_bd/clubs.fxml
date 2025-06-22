@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<HBox xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.uas_bd.ClubsController" prefHeight="400.0" prefWidth="600.0">
+    <children>
+        <fx:include source="navbar.fxml" />
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" prefHeight="400.0" prefWidth="480.0">
+            <content>
+                <VBox fx:id="clubsContainer" spacing="10.0">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                <children>
+                        <Text style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #333;" text="Clubs" textAlignment="CENTER" wrappingWidth="440" />
+                </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </children>
+</HBox>
+
