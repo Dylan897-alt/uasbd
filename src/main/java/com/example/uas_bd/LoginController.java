@@ -23,75 +23,63 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-// Pastikan Anda sudah menambahkan library hashing seperti jbcrypt jika menggunakan BCrypt
-// import org.mindrot.jbcrypt.BCrypt;
+
+// PENTING: Import BCrypt dihilangkan karena tidak digunakan
+// import org.mindrot.jbcrypt.BCrypt; // BARIS INI DIHILANGKAN
 
 public class LoginController {
 
-    // --- Deklarasi Elemen FXML (sesuai fx:id di FXML) ---
     @FXML
-    private ImageView loginImageView; // Jika ingin memanipulasi gambar
+    private ImageView loginImageView;
     @FXML
     private TextField usernameTextField;
     @FXML
     private PasswordField passwordTextField;
     @FXML
-    private Label loginTitleLabel; // Jika ingin memanipulasi judul
+    private Label loginTitleLabel;
     @FXML
     private Button signInBtn;
     @FXML
-    private Label statusPassLabel; // Untuk pesan error password
+    private Label statusPassLabel;
     @FXML
-    private Label statusSignInLabel; // Untuk pesan error username
+    private Label statusSignInLabel;
     @FXML
     private Hyperlink signUpLink;
     @FXML
-    private Label cautionLabel; // Jika ingin memanipulasi label "Don't have account?"
+    private Label cautionLabel;
     @FXML
     private ComboBox<String> roleComboBox;
 
-    // --- Database Configuration (Ganti dengan detail DB Anda) ---
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
     private static final String DB_USER = "postgres";
     private static final String DB_PASS = "Untukkuliah123";
 
-    // --- Metode Inisialisasi ---
     @FXML
     public void initialize() {
-        // Sembunyikan label status/error saat pertama kali dimuat
         statusPassLabel.setVisible(false);
         statusSignInLabel.setVisible(false);
 
-        // Isi ComboBox untuk Role (sesuai dengan yang ada di tabel mahasiswa)
         ObservableList<String> roles = FXCollections.observableArrayList("Anggota", "Pengurus");
         roleComboBox.setItems(roles);
-        roleComboBox.getSelectionModel().selectFirst(); // Pilih 'Anggota' sebagai default
+        roleComboBox.getSelectionModel().selectFirst();
     }
 
-    // --- Metode Event Handler untuk Tombol "Sign in" ---
     @FXML
     private void handleSignInButtonAction() {
-        // Sembunyikan pesan error sebelumnya
         statusPassLabel.setVisible(false);
         statusSignInLabel.setVisible(false);
 
-        String username = usernameTextField.getText(); // Kita asumsikan username adalah NRP
-        String password = passwordTextField.getText();
+        String username = usernameTextField.getText();
+        String password = passwordTextField.getText(); // Password dalam bentuk teks biasa
         String selectedRole = roleComboBox.getSelectionModel().getSelectedItem();
 
-        // 1. Validasi Input Kosong
         if (username.isEmpty() || password.isEmpty() || selectedRole == null) {
             showAlert(AlertType.WARNING, "Login Gagal", "Mohon lengkapi username, password, dan pilih role.");
             return;
         }
 
-        // 2. Autentikasi ke Database
-        // Catatan PENTING: Untuk keamanan, password di database harus di-hash (misal BCrypt).
-        // Anda perlu membandingkan hash password yang dimasukkan dengan hash di DB.
-        String query = "SELECT password_hash, role FROM mahasiswa WHERE nrp = ?"; // Asumsi ada kolom password_hash
-        // Jika Anda menyimpan password_hash di tabel terpisah (misal users), sesuaikan query
-        // query = "SELECT u.password_hash, u.role FROM users u JOIN mahasiswa m ON u.nrp = m.nrp WHERE m.nrp = ?";
-
+        // PERINGATAN SANGAT PENTING: Query ini mengambil password dalam teks biasa
+        String query = "SELECT password, role FROM mahasiswa WHERE nrp = ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -100,16 +88,13 @@ public class LoginController {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                String storedHashedPassword = rs.getString("password_hash");
+                String storedPassword = rs.getString("password"); // Mengambil password dalam teks biasa
                 String storedRole = rs.getString("role");
 
-                // Verifikasi Password (menggunakan BCrypt sebagai contoh)
-                // if (BCrypt.checkpw(password, storedHashedPassword)) { // Jika menggunakan BCrypt
-                if (password.equals(storedHashedPassword)) { // !!! SANGAT TIDAK AMAN untuk password mentah !!!
-                    // GANTI DENGAN PEMBANDING HASH!
+                // PERINGATAN SANGAT PENTING: Perbandingan password dalam teks biasa
+                if (password.equals(storedPassword)) {
                     if (selectedRole.equals(storedRole)) {
                         showAlert(AlertType.INFORMATION, "Login Berhasil", "Selamat datang, " + username + "!");
-                        // Navigasi ke dashboard sesuai role
                         navigateToDashboard(selectedRole);
                     } else {
                         statusSignInLabel.setText("Role tidak sesuai.");
@@ -130,14 +115,13 @@ public class LoginController {
         }
     }
 
-    // --- Metode Event Handler untuk Hyperlink "Sign up" ---
     @FXML
     private void handleSignUpLinkAction() {
         System.out.println("Navigasi ke halaman Sign Up...");
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("signUp.fxml")); // Ganti path
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("signUp.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) signUpLink.getScene().getWindow(); // Mendapatkan Stage dari elemen yang diklik
+            Stage stage = (Stage) signUpLink.getScene().getWindow();
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
@@ -147,7 +131,6 @@ public class LoginController {
         }
     }
 
-    // --- Helper Method untuk Menampilkan Alert ---
     private void showAlert(AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -156,20 +139,19 @@ public class LoginController {
         alert.showAndWait();
     }
 
-    // --- Metode Navigasi ke Dashboard ---
     private void navigateToDashboard(String role) {
         try {
             String fxmlPath = "";
             if ("Anggota".equals(role)) {
-                fxmlPath = "/path/to/AnggotaDashboard.fxml"; // Ganti path FXML dashboard anggota
+                fxmlPath = "/path/to/AnggotaDashboard.fxml";
             } else if ("Pengurus".equals(role)) {
-                fxmlPath = "/path/to/PengurusDashboard.fxml"; // Ganti path FXML dashboard pengurus
+                fxmlPath = "/path/to/PengurusDashboard.fxml";
             }
 
             if (!fxmlPath.isEmpty()) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
                 Parent root = loader.load();
-                Stage stage = (Stage) signInBtn.getScene().getWindow(); // Dapatkan Stage dari button
+                Stage stage = (Stage) signInBtn.getScene().getWindow();
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
                 stage.show();

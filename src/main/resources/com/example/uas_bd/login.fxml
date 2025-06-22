@@ -22,7 +22,7 @@
             </image>
         </ImageView>
         <TextField fx:id="usernameTextField" layoutX="75.0" layoutY="98.0" prefHeight="25.0" prefWidth="150.0"
-                   promptText="Username"
+                   promptText="NRP"
                    style="-fx-background-color: Transparent; -fx-background-radius: 0; -fx-border-color: #ffcc4c; -fx-border-width: 0 0 1 0; -fx-border-radius: 0;"/>
         <PasswordField fx:id="passwordTextField" layoutX="75.0" layoutY="151.0" prefHeight="25.0" prefWidth="150.0"
                        promptText="Password"
