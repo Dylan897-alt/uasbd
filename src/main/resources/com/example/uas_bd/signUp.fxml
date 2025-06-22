@@ -17,7 +17,7 @@
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
            prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, #333333, #000000);"
            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="your.package.SignUpController">
+           fx:controller="com.example.uas_bd.SignUpController">
     <children>
         <GridPane alignment="CENTER" hgap="5.0" maxHeight="400.0" maxWidth="300.0" prefHeight="400.0" prefWidth="300.0"
                   style="-fx-background-color: white;" vgap="10.0">

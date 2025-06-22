@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="210.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.uas_bd.ActivityCardController">
+    <children>
+        <Label fx:id="namaKegiatanLabel" text="[Nama Kegiatan]">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+            <VBox.margin>
+                <Insets bottom="5.0" />
+            </VBox.margin>
+        </Label>
+        <Label fx:id="clubPenyelenggaraLabel" text="Oleh: [Nama Club]">
+            <font>
+                <Font size="12.0" />
+            </font>
+            <VBox.margin>
+                <Insets bottom="5.0" />
+            </VBox.margin>
+        </Label>
+        <HBox alignment="CENTER_LEFT" spacing="5.0">
+            <children>
+                <Label text="Tanggal:" />
+                <Label fx:id="tanggalLabel" text="[Tanggal]" />
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="5.0">
+            <children>
+                <Label text="Waktu:" />
+                <Label fx:id="waktuLabel" text="[Waktu]" />
+            </children>
+            <VBox.margin>
+                <Insets bottom="5.0" />
+            </VBox.margin>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="5.0">
+            <children>
+                <Label text="Lokasi:" />
+                <Label fx:id="lokasiLabel" text="[Lokasi]" />
+            </children>
+            <VBox.margin>
+                <Insets bottom="5.0" />
+            </VBox.margin>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="5.0">
+            <children>
+                <Label text="Jenis:" />
+                <Label fx:id="jenisKegiatanLabel" text="[Jenis Kegiatan]" />
+            </children>
+            <VBox.margin>
+                <Insets bottom="10.0" />
+            </VBox.margin>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
+            <children>
+                <Button fx:id="detailButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="135.0" style="-fx-background-color: #007ACC; -fx-text-fill: white;" text="Lihat Detail">
+                    <HBox.margin>
+                        <Insets right="5.0" />
+                    </HBox.margin>
+                </Button>
+                <Button fx:id="daftarButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="106.0" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Daftar" />
+                <Button fx:id="editButton" mnemonicParsing="false" style="-fx-background-color: #FFC107; -fx-text-fill: black;" text="Edit" visible="false">
+                    <HBox.margin>
+                        <Insets right="5.0" />
+                    </HBox.margin>
+                </Button>
+                <Button fx:id="deleteButton" mnemonicParsing="false" style="-fx-background-color: #DC3545; -fx-text-fill: white;" text="Hapus" visible="false" />
+            </children>
+            <padding>
+                <Insets right="5.0" />
+            </padding>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+</VBox>
