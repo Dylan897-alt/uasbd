@@ -43,6 +43,10 @@ public class KegiatanListController {
     private static final String DB_USER = "postgres"; // Ganti
     private static final String DB_PASS = "Untukkuliah123"; // Ganti
 
+//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
+//    private static final String DB_USER = "postgres";
+//    private static final String DB_PASS = "Dylan030506";
+
     @FXML
     public void initialize() {
         // Atur visibilitas tombol tambah kegiatan berdasarkan role

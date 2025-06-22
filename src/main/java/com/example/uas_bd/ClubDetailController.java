@@ -26,7 +26,7 @@ public class ClubDetailController {
     @FXML
     private ImageView clubImage;
     @FXML
-    private HBox actionContainer;
+    private VBox actionContainer;
     @FXML
     private VBox infoContainer;
     @FXML

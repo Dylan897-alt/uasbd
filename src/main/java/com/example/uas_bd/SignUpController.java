@@ -3,9 +3,14 @@ package com.example.uas_bd;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.*;
 // PENTING: Import BCrypt dihilangkan karena tidak digunakan
 // import org.mindrot.jbcrypt.BCrypt; // BARIS INI DIHILANGKAN
@@ -38,6 +43,9 @@ public class SignUpController {
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
     private static final String DB_USER = "postgres";
     private static final String DB_PASS = "Untukkuliah123";
+//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
+//    private static final String DB_USER = "postgres";
+//    private static final String DB_PASS = "Dylan030506";
 
     @FXML
     public void initialize() {
@@ -171,6 +179,17 @@ public class SignUpController {
     private void handleLoginLinkAction() {
         System.out.println("Navigasi ke halaman Login...");
         // Implementasi navigasi ke Login.fxml
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) loginHyperlink.getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(AlertType.ERROR, "Kesalahan Navigasi", "Gagal memuat halaman Login.");
+        }
     }
 
     private String getProdiIdByName(String namaProdi) {

@@ -27,7 +27,7 @@
                     <ImageView fx:id="clubImage" fitHeight="250" fitWidth="250" preserveRatio="true" />
 
                     <!-- Daftar or Sudah Terdaftar -->
-                    <HBox fx:id="actionContainer" alignment="CENTER" spacing="10.0"/>
+                    <VBox fx:id="actionContainer" alignment="CENTER" spacing="10.0"/>
 
                     <!-- Info below -->
                     <VBox fx:id="infoContainer" spacing="10.0" alignment="TOP_LEFT"/>
