@@ -17,6 +17,9 @@
                     <padding>
                         <Insets top="10" right="10" bottom="10" left="10"/>
                     </padding>
+                <children>
+                        <Text style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #333;" text="Clubs" textAlignment="CENTER" wrappingWidth="440" />
+                </children>
                 </VBox>
             </content>
         </ScrollPane>
