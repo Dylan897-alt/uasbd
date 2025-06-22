@@ -35,7 +35,7 @@ public class MyClubsController {
         String nrp = "c14240058";
         Connection conn = DatabaseConnector.connect();
         if (conn == null) {
-            showAlert("Database Error", "Failed to connect to the database. Please check your settings.");
+            showError("Error Database", "Gagal connect ke database. Cek settingnya.");
             return;
         }
         try {
@@ -98,8 +98,7 @@ public class MyClubsController {
                         stage.setScene(scene);
                         stage.show();
                     } catch (IOException e) {
-                        e.printStackTrace();
-                        showAlert("Navigation Error", "Failed to load club detail page.");
+                        showError("Error Navigasi", e.getMessage());
                     }
                 });
 
@@ -134,7 +133,7 @@ public class MyClubsController {
 
         } catch (SQLException e) {
             System.out.println("Failed to load clubs: " + e.getMessage());
-            showAlert("Database Error", "Could not load clubs from the database:\n" + e.getMessage());
+            showError("Error Database", e.getMessage());
         }
     }
 
@@ -151,8 +150,7 @@ public class MyClubsController {
         if (imageStream == null) {
             imageStream = getClass().getResourceAsStream("/images/image-not-found.png");
             if (imageStream == null) {
-                showAlert("Image Error", "Fallback image is missing");
-
+                showError("Error Image", "Fallback image tidak ditemukan.");
                 throw new RuntimeException("Fallback image not found: image-not-found.png");
             }
         }
@@ -176,7 +174,7 @@ public class MyClubsController {
         clubsContainer.getChildren().add(card);
     }
 
-    private void showAlert(String title, String message) {
+    private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
