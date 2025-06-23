@@ -39,7 +39,7 @@ public class ClubDetailController {
     public void loadClubData(){
         Connection conn = DatabaseConnector.connect();
         if (conn == null) {
-            showAlert("Database Error", "Failed to connect to the database. Please check your settings.");
+            showError("Error Database", "Gagal connect ke database. Cek settingnya.");
             return;
         }
 
@@ -89,10 +89,10 @@ public class ClubDetailController {
 
                 infoContainer.getChildren().addAll(nameLabel, descLabel, yearLabel);
             } else {
-                showAlert("Not Found", "Club with ID " + clubID + " was not found.");
+                showError("Klub Tidak Ditemukan", "Klub dengan ID " + clubID + " tidak ditemukan.");
             }
         } catch (SQLException e) {
-            showAlert("Database Error", "Error retrieving club:\n" + e.getMessage());
+            showError("Error Database", e.getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ public class ClubDetailController {
             success.setContentText("Berhasil mendaftar ke " + name + " sebagai anggota!");
             success.showAndWait();
         } catch (SQLException e) {
-            showAlert("Registration Error", "Failed to register:\n" + e.getMessage());
+            showError("Error Registrasi", e.getMessage());
         }
     }
 
@@ -142,7 +142,7 @@ public class ClubDetailController {
         if (imageStream == null) {
             imageStream = getClass().getResourceAsStream("/images/image-not-found.png");
             if (imageStream == null) {
-                showAlert("Image Error", "Fallback image is missing");
+                showError("Image", "Fallback image tidak ditemukan");
                 throw new RuntimeException("Fallback image not found");
             }
         }
@@ -150,7 +150,7 @@ public class ClubDetailController {
         return new Image(imageStream);
     }
 
-    private void showAlert(String title, String message) {
+    private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);

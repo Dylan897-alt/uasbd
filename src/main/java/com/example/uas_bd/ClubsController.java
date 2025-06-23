@@ -13,9 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
@@ -35,7 +32,7 @@ public class ClubsController {
 
         Connection conn = DatabaseConnector.connect();
         if (conn == null) {
-            showAlert("Database Error", "Failed to connect to the database. Please check your settings.");
+            showError("Error Database", "Gagal connect ke database. Cek settingnya.");
             return;
         }
 
@@ -66,8 +63,7 @@ public class ClubsController {
                         stage.setScene(scene);
                         stage.show();
                     } catch (IOException e) {
-                        e.printStackTrace();
-                        showAlert("Navigation Error", "Failed to load club detail page.");
+                        showError("Error Navigasi", e.getMessage());
                     }
                 });
 
@@ -97,8 +93,7 @@ public class ClubsController {
             }
 
         } catch (SQLException e) {
-            System.err.println("Failed to load clubs: " + e.getMessage());
-            showAlert("Database Error", "Error retrieving clubs from database:\n" + e.getMessage());
+            showError("Error Database", e.getMessage());
         }
     }
 
@@ -115,7 +110,7 @@ public class ClubsController {
         if (imageStream == null) {
             imageStream = getClass().getResourceAsStream("/images/image-not-found.png");
             if (imageStream == null) {
-                showAlert("Image Error", "Fallback image is missing");
+                showError("Error Image", "Fallback image tidak ditemukan.");
                 throw new RuntimeException("Fallback image not found: image-not-found.png");
             }
         }
@@ -127,7 +122,7 @@ public class ClubsController {
         return imageView;
     }
 
-    private void showAlert(String title, String message) {
+    private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
