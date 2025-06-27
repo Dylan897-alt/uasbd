@@ -97,8 +97,23 @@ public class LoginController {
                 // PERINGATAN SANGAT PENTING: Perbandingan password dalam teks biasa
                 if (password.equals(storedPassword)) {
                     if (selectedRole.equals(storedRole)) {
-                        showAlert(AlertType.INFORMATION, "Login Berhasil", "Selamat datang, " + username + "!");
-                        navigateToDashboard(selectedRole);
+                        // Ambil juga nama dan email jika diperlukan di sesi
+                        String queryForDetails = "SELECT nama, email FROM mahasiswa WHERE nrp = ?";
+                        try (PreparedStatement pstmtDetails = conn.prepareStatement(queryForDetails)) {
+                            pstmtDetails.setString(1, username);
+                            ResultSet rsDetails = pstmtDetails.executeQuery();
+                            if (rsDetails.next()) {
+                                String nama = rsDetails.getString("nama");
+                                String email = rsDetails.getString("email");
+
+                                // --- PENTING: ISI DATA SESI DI SINI ---
+                                UserSession.createSession(username, nama, email, storedRole);
+                                // ------------------------------------
+
+                                showAlert(AlertType.INFORMATION, "Login Berhasil", "Selamat datang, " + nama + "!");
+                                navigateToDashboard(storedRole);
+                            }
+                        }
                     } else {
                         statusSignInLabel.setText("Role tidak sesuai.");
                         statusSignInLabel.setVisible(true);
@@ -106,6 +121,7 @@ public class LoginController {
                 } else {
                     statusPassLabel.setText("Password salah!");
                     statusPassLabel.setVisible(true);
+
                 }
             } else {
                 statusSignInLabel.setText("Username tidak terdaftar.");
