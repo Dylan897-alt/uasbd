@@ -20,25 +20,29 @@ public class SertifikatController {
     }
 
     private void loadSertifikat() {
+//        String nrp = UserSession.getLoggedInNrp();
+        String nrp = "c14240039";
         String sql = """
             SELECT p.no_sertif, k.nama_kegiatan, c.nama_club
             FROM presensi p
             JOIN kegiatan_club k ON p.id_kegiatan = k.id_kegiatan
             JOIN club c ON k.id_club = c.id_club
-            WHERE p.no_sertif IS NOT NULL
+            WHERE p.no_sertif IS NOT NULL and p.nrp = ?
         """;
 
         try (Connection conn = DatabaseConnector.connect();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                String noSertif = rs.getString("no_sertif");
-                String kegiatanName = rs.getString("nama_kegiatan");
-                String clubName = rs.getString("nama_club");
+            stmt.setString(1, nrp); // ✅ Now allowed
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String noSertif = rs.getString("no_sertif");
+                    String kegiatanName = rs.getString("nama_kegiatan");
+                    String clubName = rs.getString("nama_club");
 
-                String display = String.format("Sertifikat: %s\nKegiatan: %s\nClub: %s", noSertif, kegiatanName, clubName);
-                sertifikatListView.getItems().add(display);
+                    String display = String.format("Sertifikat: %s\nKegiatan: %s\nClub: %s", noSertif, kegiatanName, clubName);
+                    sertifikatListView.getItems().add(display);
+                }
             }
 
         } catch (SQLException e) {
