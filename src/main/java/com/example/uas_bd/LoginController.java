@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -49,13 +50,13 @@ public class LoginController {
     private Label cautionLabel;
     @FXML
     private ComboBox<String> roleComboBox;
-//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
-//    private static final String DB_USER = "postgres";
-//    private static final String DB_PASS = "Dylan030506";
-
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
     private static final String DB_USER = "postgres";
-    private static final String DB_PASS = "Untukkuliah123";
+    private static final String DB_PASS = "Dylan030506";
+
+//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
+//    private static final String DB_USER = "postgres";
+//    private static final String DB_PASS = "Untukkuliah123";
 
     @FXML
     public void initialize() {
@@ -162,7 +163,8 @@ public class LoginController {
         try {
             String fxmlPath = "";
             if ("Anggota".equals(role)) {
-                fxmlPath = "/path/to/AnggotaDashboard.fxml";
+//                fxmlPath = "/path/to/AnggotaDashboard.fxml";
+                fxmlPath = "clubs.fxml";
             } else if ("Pengurus".equals(role)) {
                 fxmlPath = "/path/to/PengurusDashboard.fxml";
             }

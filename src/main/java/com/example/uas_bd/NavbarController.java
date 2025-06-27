@@ -6,7 +6,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,6 +22,8 @@ public class NavbarController {
     private Button clubsButton;
     @FXML
     private Button myClubsButton;
+    @FXML
+    private Button logoutButton;
 
     public void onClubsClick(ActionEvent event) throws IOException {
         switchScene(event, "clubs.fxml");
@@ -27,6 +31,23 @@ public class NavbarController {
 
     public void onMyClubsClick(ActionEvent event) throws IOException{
         switchScene(event, "my-clubs.fxml");
+    }
+
+    public void onLogoutClick(ActionEvent event) throws IOException{
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Konfirmasi Logout");
+        confirmation.setHeaderText(null);
+        confirmation.setContentText("Apakah kamu ingin log out?");
+
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    switchScene(event, "login.fxml");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void switchScene(ActionEvent event, String fxmlFile) throws IOException {

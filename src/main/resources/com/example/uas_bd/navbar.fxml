@@ -8,6 +8,6 @@
         <Button prefHeight="26.0" prefWidth="120.0" text="Dashbboard" />
         <Button fx:id="clubsButton" onAction="#onClubsClick" prefHeight="26.0" prefWidth="120.0" text="Clubs" />
         <Button fx:id="myClubsButton" onAction="#onMyClubsClick" prefHeight="26.0" prefWidth="120.0" text="My Clubs" />
-        <Button prefHeight="26.0" prefWidth="120.0" text="Logout" />
+        <Button fx:id="logoutButton" onAction="#onLogoutClick" prefHeight="26.0" prefWidth="120.0" text="Logout" />
     </children>
 </VBox>
