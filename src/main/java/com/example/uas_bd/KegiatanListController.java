@@ -39,17 +39,17 @@ public class KegiatanListController {
     private String currentUserRole = "Anggota"; // Default atau ambil dari sesi
 
     // Database Configuration
-//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData"; // Ganti
-//    private static final String DB_USER = "postgres"; // Ganti
-//    private static final String DB_PASS = "Untukkuliah123"; // Ganti
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData"; // Ganti
+    private static final String DB_USER = "postgres"; // Ganti
+    private static final String DB_PASS = "Untukkuliah123"; // Ganti
 
 //    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
 //    private static final String DB_USER = "postgres";
 //    private static final String DB_PASS = "Dylan030506";
 
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/HR BD A";
-    private static final String DB_USER = "postgres";
-    private static final String DB_PASS = "POSTGRESSQL";
+//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/HR BD A";
+//    private static final String DB_USER = "postgres";
+//    private static final String DB_PASS = "POSTGRESSQL";
 
     @FXML
     public void initialize() {
@@ -206,25 +206,22 @@ public class KegiatanListController {
         showAlert(AlertType.INFORMATION, "Lihat Detail", "Akan menampilkan detail kegiatan: " + kegiatan.getNamaKegiatan());
     }
 
-    public void handleDaftarKegiatan(Kegiatan kegiatan) {
-        // 1. Dapatkan NRP pengguna yang login dari UserSession
+    public void handleDaftarKegiatan(Kegiatan kegiatan, ActivityCardController cardController) {
         String loggedInNrp = UserSession.getLoggedInNrp();
         if (loggedInNrp == null || !UserSession.isLoggedIn()) {
             showAlert(AlertType.ERROR, "Sesi Tidak Valid", "Anda harus login untuk bisa mendaftar kegiatan.");
             return;
         }
 
-        // 2. Tampilkan dialog konfirmasi
         Alert confirmAlert = new Alert(AlertType.CONFIRMATION);
         confirmAlert.setTitle("Konfirmasi Pendaftaran");
         confirmAlert.setHeaderText("Mendaftar ke: " + kegiatan.getNamaKegiatan());
         confirmAlert.setContentText("Apakah Anda yakin ingin mendaftar ke kegiatan ini?");
 
-        // 3. Proses setelah pengguna mengklik tombol di dialog
         confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                // Jika pengguna menekan OK, jalankan logika pendaftaran ke database
-                registerToActivityInDb(loggedInNrp, kegiatan.getIdKegiatan(), kegiatan.getNamaKegiatan());
+                // Kirim cardController ke metode registrasi
+                registerToActivityInDb(loggedInNrp, kegiatan.getIdKegiatan(), kegiatan.getNamaKegiatan(), cardController);
             }
         });
     }
@@ -235,24 +232,28 @@ public class KegiatanListController {
      * @param idKegiatan ID kegiatan yang didaftari.
      * @param namaKegiatan Nama kegiatan untuk pesan notifikasi.
      */
-    private void registerToActivityInDb(String nrp, int idKegiatan, String namaKegiatan) {
+    private void registerToActivityInDb(String nrp, int idKegiatan, String namaKegiatan, ActivityCardController cardController) {
         String query = "INSERT INTO registrasi (nrp, id_kegiatan, tanggal_registrasi, status_registrasi) VALUES (?, ?, CURRENT_TIMESTAMP, ?)";
 
-        try (Connection conn = DatabaseConnector.connect(); // Gunakan DatabaseConnector
+        try (Connection conn = DatabaseConnector.connect();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, nrp);
             pstmt.setInt(2, idKegiatan);
-            pstmt.setString(3, "Terdaftar"); // Status default saat mendaftar
+            pstmt.setString(3, "Terdaftar");
 
-            pstmt.executeUpdate();
-
-            showAlert(AlertType.INFORMATION, "Pendaftaran Berhasil", "Anda berhasil terdaftar di kegiatan: " + namaKegiatan);
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                showAlert(AlertType.INFORMATION, "Pendaftaran Berhasil", "Anda berhasil terdaftar di kegiatan: " + namaKegiatan);
+                // Panggil metode untuk update UI kartu
+                cardController.updateToRegisteredState();
+            }
 
         } catch (SQLException e) {
-            // Tangani kasus jika pengguna sudah pernah mendaftar (unique constraint violation)
-            if (e.getSQLState().equals("23505")) { // Kode error untuk unique violation di PostgreSQL
+            if (e.getSQLState().equals("23505")) { // Handle jika sudah terdaftar
                 showAlert(AlertType.WARNING, "Pendaftaran Gagal", "Anda sudah pernah terdaftar di kegiatan ini.");
+                // Jika sudah terdaftar, update juga UI-nya agar konsisten
+                cardController.updateToRegisteredState();
             } else {
                 e.printStackTrace();
                 showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal mendaftar kegiatan: " + e.getMessage());
