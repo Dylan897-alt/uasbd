@@ -207,9 +207,57 @@ public class KegiatanListController {
     }
 
     public void handleDaftarKegiatan(Kegiatan kegiatan) {
-        System.out.println("Anggota mendaftar kegiatan: " + kegiatan.getNamaKegiatan());
-        // Implementasi logika pendaftaran ke tabel registrasi
-        showAlert(AlertType.INFORMATION, "Pendaftaran", "Anda akan mendaftar ke kegiatan: " + kegiatan.getNamaKegiatan());
+        // 1. Dapatkan NRP pengguna yang login dari UserSession
+        String loggedInNrp = UserSession.getLoggedInNrp();
+        if (loggedInNrp == null || !UserSession.isLoggedIn()) {
+            showAlert(AlertType.ERROR, "Sesi Tidak Valid", "Anda harus login untuk bisa mendaftar kegiatan.");
+            return;
+        }
+
+        // 2. Tampilkan dialog konfirmasi
+        Alert confirmAlert = new Alert(AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Konfirmasi Pendaftaran");
+        confirmAlert.setHeaderText("Mendaftar ke: " + kegiatan.getNamaKegiatan());
+        confirmAlert.setContentText("Apakah Anda yakin ingin mendaftar ke kegiatan ini?");
+
+        // 3. Proses setelah pengguna mengklik tombol di dialog
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                // Jika pengguna menekan OK, jalankan logika pendaftaran ke database
+                registerToActivityInDb(loggedInNrp, kegiatan.getIdKegiatan(), kegiatan.getNamaKegiatan());
+            }
+        });
+    }
+
+    /**
+     * Logika untuk memasukkan data pendaftaran ke tabel 'registrasi' di database.
+     * @param nrp NRP pengguna yang mendaftar.
+     * @param idKegiatan ID kegiatan yang didaftari.
+     * @param namaKegiatan Nama kegiatan untuk pesan notifikasi.
+     */
+    private void registerToActivityInDb(String nrp, int idKegiatan, String namaKegiatan) {
+        String query = "INSERT INTO registrasi (nrp, id_kegiatan, tanggal_registrasi, status_registrasi) VALUES (?, ?, CURRENT_TIMESTAMP, ?)";
+
+        try (Connection conn = DatabaseConnector.connect(); // Gunakan DatabaseConnector
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, nrp);
+            pstmt.setInt(2, idKegiatan);
+            pstmt.setString(3, "Terdaftar"); // Status default saat mendaftar
+
+            pstmt.executeUpdate();
+
+            showAlert(AlertType.INFORMATION, "Pendaftaran Berhasil", "Anda berhasil terdaftar di kegiatan: " + namaKegiatan);
+
+        } catch (SQLException e) {
+            // Tangani kasus jika pengguna sudah pernah mendaftar (unique constraint violation)
+            if (e.getSQLState().equals("23505")) { // Kode error untuk unique violation di PostgreSQL
+                showAlert(AlertType.WARNING, "Pendaftaran Gagal", "Anda sudah pernah terdaftar di kegiatan ini.");
+            } else {
+                e.printStackTrace();
+                showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal mendaftar kegiatan: " + e.getMessage());
+            }
+        }
     }
 
     // Metode untuk Pengurus
