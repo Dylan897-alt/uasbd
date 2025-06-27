@@ -6,7 +6,7 @@
 
 <HBox xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.uas_bd.EditClubController" prefHeight="400.0" prefWidth="600.0">
     <children>
-        <fx:include source="navbar.fxml"/>
+        <fx:include source="navbar-pengurus.fxml"/>
         <ScrollPane fitToWidth="true" vbarPolicy="AS_NEEDED" hbarPolicy="NEVER" prefHeight="400.0" prefWidth="480.0">
             <content>
                 <VBox spacing="10.0" fx:id="mainContainer">
