@@ -13,11 +13,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+/**
+ * Controller untuk halaman "Klub Saya".
+ * Menampilkan daftar semua klub di mana pengguna yang sedang login terdaftar sebagai anggota.
+ */
 public class MyClubsController {
 
     @FXML
@@ -25,151 +32,149 @@ public class MyClubsController {
 
     @FXML
     public void initialize() {
-        loadClubsFromDatabase();
+        loadJoinedClubsFromDatabase();
     }
 
-    private void loadClubsFromDatabase() {
-        String nrp = UserSession.getLoggedInNrp();
-        System.out.println(nrp);
-        Connection conn = DatabaseConnector.connect();
-        if (conn == null) {
-            showError("Error Database", "Gagal connect ke database. Cek settingnya.");
+    /**
+     * Memuat klub yang diikuti oleh pengguna yang sedang login dari database.
+     * Menggunakan satu query JOIN yang efisien.
+     */
+    private void loadJoinedClubsFromDatabase() {
+        clubsContainer.getChildren().clear(); // Bersihkan container setiap kali memuat
+
+        // --- PERBAIKAN 1: Menggunakan UserSession untuk mendapatkan NRP dinamis ---
+        String loggedInNrp = UserSession.getLoggedInNrp();
+
+        // Validasi: Pastikan pengguna sudah login sebelum melanjutkan
+        if (loggedInNrp == null || !UserSession.isLoggedIn()) {
+            showError("Sesi Tidak Valid", "Tidak dapat memuat data klub karena sesi pengguna tidak ditemukan. Silakan login kembali.");
             return;
         }
-        try {
-            String query = "SELECT id_club FROM keanggotaan WHERE nrp = ?";
-            PreparedStatement ps1 = conn.prepareStatement(query);
-            ps1.setString(1, nrp);
-            ResultSet rs1 = ps1.executeQuery();
 
-            ArrayList<Integer> clubIDs = new ArrayList<>();
-            while (rs1.next()) {
-                clubIDs.add(rs1.getInt("id_club"));
-            }
+        // --- PERBAIKAN 2: Query database yang lebih efisien ---
+        // Menggunakan satu query JOIN untuk mendapatkan semua data klub yang relevan sekaligus.
+        // Ini lebih baik daripada 2 query terpisah.
+        String query = "SELECT c.id_club, c.nama_club, c.deskripsi, c.tahun_berdiri, c.image_path " +
+                "FROM club c " +
+                "JOIN keanggotaan k ON c.id_club = k.id_club " +
+                "WHERE k.nrp = ? " +
+                "ORDER BY c.nama_club ASC";
 
-            if (clubIDs.isEmpty()) {
-                showNoClubsMessage();
+        // --- PERBAIKAN 3: Manajemen koneksi yang aman dengan try-with-resources ---
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            if (conn == null) {
+                showError("Kesalahan Database", "Gagal terhubung ke database.");
                 return;
             }
 
-            StringBuilder placeholders = new StringBuilder();
-            for (int i = 0; i < clubIDs.size(); i++) {
-                placeholders.append("?");
-                if (i < clubIDs.size() - 1) {
-                    placeholders.append(",");
-                }
-            }
-
-            String query2 = "SELECT * FROM club WHERE id_club IN (" + placeholders + ")";
-            PreparedStatement ps2 = conn.prepareStatement(query2);
-
-            for (int i = 0; i < clubIDs.size(); i++) {
-                ps2.setInt(i + 1, clubIDs.get(i));
-            }
-
-            ResultSet rs2 = ps2.executeQuery();
+            pstmt.setString(1, loggedInNrp);
+            ResultSet rs = pstmt.executeQuery();
 
             boolean hasClubs = false;
-
-            while (rs2.next()) {
+            while (rs.next()) {
                 hasClubs = true;
-                int clubID = rs2.getInt("id_club");
-                String name = rs2.getString("nama_club");
-                String description = rs2.getString("deskripsi");
-                int year = rs2.getInt("tahun_berdiri");
-                String imagePath = rs2.getString("image_path");
+                int clubID = rs.getInt("id_club");
+                String name = rs.getString("nama_club");
+                String description = rs.getString("deskripsi");
+                int year = rs.getInt("tahun_berdiri");
+                String imagePath = rs.getString("image_path");
 
-                HBox clubBox = new HBox(10);
-                clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 5; -fx-padding: 10;");
-                clubBox.setAlignment(Pos.CENTER_LEFT);
-
-                clubBox.setOnMouseClicked(event -> {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("club-detail.fxml"));
-                        Parent root = loader.load();
-                        ClubDetailController controller = loader.getController();
-                        controller.setClubID(clubID);
-                        controller.loadClubData();
-
-                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                        Scene scene = new Scene(root);
-                        stage.setScene(scene);
-                        stage.show();
-                    } catch (IOException e) {
-                        showError("Error Navigasi", e.getMessage());
-                    }
-                });
-
-                clubBox.setOnMouseEntered(e -> {
-                    clubBox.setStyle("-fx-border-color: lightblue; -fx-border-width: 2; -fx-border-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, lightblue, 10, 0.3, 0, 0);");
-                });
-
-                clubBox.setOnMouseExited(e -> {
-                    clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 5; -fx-padding: 10;");
-                });
-
-                clubBox.getChildren().add(createImageView(imagePath));
-
-                VBox textContainer = new VBox(5);
-                Label nameLabel = new Label(name);
-                nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-                Label descLabel = new Label(description);
-                descLabel.setWrapText(true);
-
-                Label yearLabel = new Label("Founded: " + year);
-
-                textContainer.getChildren().addAll(nameLabel, descLabel, yearLabel);
-                clubBox.getChildren().add(textContainer);
-
+                HBox clubBox = createClubVisualBox(clubID, name, description, year, imagePath);
                 clubsContainer.getChildren().add(clubBox);
             }
 
+            // Jika setelah loop selesai tidak ada klub yang ditemukan, tampilkan pesan.
             if (!hasClubs) {
                 showNoClubsMessage();
             }
 
         } catch (SQLException e) {
-            System.out.println("Failed to load clubs: " + e.getMessage());
-            showError("Error Database", e.getMessage());
+            e.printStackTrace();
+            showError("Kesalahan Database", "Gagal memuat data klub Anda: " + e.getMessage());
         }
+    }
+
+    /**
+     * Membuat satu HBox visual yang berisi informasi lengkap untuk satu klub.
+     * Direfaktor dari ClubsController untuk konsistensi.
+     */
+    private HBox createClubVisualBox(int clubID, String name, String description, int year, String imagePath) {
+        HBox clubBox = new HBox(20);
+        clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: white;");
+        clubBox.setAlignment(Pos.CENTER_LEFT);
+
+        // --- PERBAIKAN 4: Menggunakan metode navigasi yang benar ---
+        clubBox.setOnMouseClicked(event -> navigateToClubDetail(clubID, (Node) event.getSource()));
+        clubBox.setOnMouseEntered(e -> clubBox.setStyle("-fx-border-color: #0078D7; -fx-border-width: 2; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: #f0f8ff; -fx-effect: dropshadow(three-pass-box, rgba(0,120,215,0.3), 10, 0, 0, 0);"));
+        clubBox.setOnMouseExited(e -> clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: white;"));
+
+        clubBox.getChildren().add(createImageView(imagePath));
+
+        VBox textContainer = new VBox(5);
+        textContainer.setAlignment(Pos.CENTER_LEFT);
+
+        Label nameLabel = new Label(name);
+        nameLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+        Label descLabel = new Label(description);
+        descLabel.setWrapText(true);
+        descLabel.setStyle("-fx-font-size: 14px;");
+
+        Label yearLabel = new Label("Berdiri sejak: " + year);
+        yearLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+
+        textContainer.getChildren().addAll(nameLabel, descLabel, yearLabel);
+        clubBox.getChildren().add(textContainer);
+
+        return clubBox;
+    }
+
+    /**
+     * Logika untuk berpindah dari halaman ini ke halaman detail klub.
+     * Memastikan memanggil metode yang benar di ClubDetailController.
+     */
+    private void navigateToClubDetail(int clubID, Node sourceNode) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ClubDetail.fxml"));
+            Parent root = loader.load();
+
+            ClubDetailController controller = loader.getController();
+            controller.initializeClubData(clubID); // Memanggil metode yang sudah disempurnakan
+
+            Stage stage = (Stage) sourceNode.getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Kesalahan Navigasi", "Gagal memuat halaman detail klub: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Menampilkan pesan bahwa pengguna belum bergabung dengan klub apa pun.
+     */
+    private void showNoClubsMessage() {
+        Label messageLabel = new Label("Anda belum bergabung dengan klub mana pun.");
+        messageLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #555;");
+        clubsContainer.getChildren().add(messageLabel);
+        clubsContainer.setAlignment(Pos.CENTER);
     }
 
     private ImageView createImageView(String imagePath) {
         InputStream imageStream = null;
-
         if (imagePath != null && !imagePath.trim().isEmpty()) {
             imageStream = getClass().getResourceAsStream("/images/" + imagePath);
-            if (imageStream == null) {
-                System.err.println("Image not found in resources: " + imagePath);
-            }
         }
-
         if (imageStream == null) {
             imageStream = getClass().getResourceAsStream("/images/image-not-found.png");
             if (imageStream == null) {
-                showError("Error Image", "Fallback image tidak ditemukan.");
-                throw new RuntimeException("Fallback image not found: image-not-found.png");
+                throw new RuntimeException("Krisis! Gambar fallback 'image-not-found.png' tidak ditemukan.");
             }
         }
-
-        ImageView imageView = new ImageView(new Image(imageStream));
-        imageView.setFitHeight(100);
-        imageView.setFitWidth(100);
-        imageView.setPreserveRatio(true);
-        return imageView;
-    }
-
-    private void showNoClubsMessage() {
-        VBox card = new VBox(5);
-        card.setStyle("-fx-border-color: lightgray; -fx-border-radius: 5; -fx-padding: 10;");
-
-        Label messageLabel = new Label("Kamu belum masuk ke klub manapun.");
-        messageLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: gray;");
-        messageLabel.setWrapText(true);
-
-        card.getChildren().add(messageLabel);
-        clubsContainer.getChildren().add(card);
+        return new ImageView(new Image(imageStream));
     }
 
     private void showError(String title, String message) {

@@ -1,166 +1,229 @@
 package com.example.uas_bd;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.Optional;
 
+/**
+ * Controller untuk halaman yang menampilkan detail dari satu klub spesifik.
+ * Dari sini, pengguna bisa melihat informasi lengkap dan mendaftar sebagai anggota.
+ */
 public class ClubDetailController {
-    private int clubID;
-    private final String nrp = UserSession.getLoggedInNrp();
 
     @FXML
-    private ImageView clubImage;
+    private ImageView clubImageView;
     @FXML
-    private VBox actionContainer;
+    private Label clubNameLabel;
     @FXML
-    private VBox infoContainer;
+    private Label clubDescriptionLabel;
     @FXML
-    private VBox clubsContainer;
+    private Label clubYearLabel;
+    @FXML
+    private VBox actionContainer; // Container untuk tombol "Daftar" atau status "Sudah Terdaftar"
 
-    public void setClubID(int clubID){
-        this.clubID = clubID;
+    private int clubId;
+    private String clubName; // Simpan nama klub untuk digunakan di notifikasi
+
+    /**
+     * Metode ini dipanggil oleh ClubsController untuk mengirimkan ID klub yang dipilih.
+     * Ini adalah titik masuk utama untuk controller ini.
+     * @param clubId ID dari klub yang akan ditampilkan.
+     */
+    public void initializeClubData(int clubId) {
+        this.clubId = clubId;
+        // Setelah ID didapat, muat semua data dari database
+        loadClubDetails();
     }
 
-    public void loadClubData(){
-        Connection conn = DatabaseConnector.connect();
-        if (conn == null) {
-            showError("Error Database", "Gagal connect ke database. Cek settingnya.");
-            return;
-        }
+    /**
+     * Memuat semua detail klub dari database (nama, deskripsi, gambar)
+     * dan kemudian memeriksa status keanggotaan pengguna.
+     */
+    private void loadClubDetails() {
+        String query = "SELECT nama_club, deskripsi, tahun_berdiri, image_path FROM club WHERE id_club = ?";
 
-        try {
-            String query = "SELECT * FROM club WHERE id_club = ?";
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setInt(1, clubID);
-            ResultSet rs = stmt.executeQuery();
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            if (conn == null) {
+                showError("Kesalahan Database", "Gagal terhubung ke database.");
+                return;
+            }
+
+            pstmt.setInt(1, this.clubId);
+            ResultSet rs = pstmt.executeQuery();
+
             if (rs.next()) {
-                String name = rs.getString("nama_club");
+                this.clubName = rs.getString("nama_club");
                 String description = rs.getString("deskripsi");
                 int year = rs.getInt("tahun_berdiri");
                 String imagePath = rs.getString("image_path");
 
-                clubImage.setImage(loadImage(imagePath));
+                // Setel UI dengan data yang didapat
+                clubNameLabel.setText(this.clubName);
+                clubDescriptionLabel.setText(description);
+                clubYearLabel.setText("Berdiri sejak: " + year);
+                clubImageView.setImage(loadImage(imagePath));
 
-                if (isUserMember(conn)) {
-                    Label alreadyJoined = new Label("Sudah terdaftar");
-                    alreadyJoined.setStyle("-fx-font-size: 14px; -fx-text-fill: green;");
-                    actionContainer.getChildren().add(alreadyJoined);
-                } else {
-                    Button joinButton = new Button("Daftar");
-                    joinButton.setOnAction(e -> {
-                        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-                        confirmation.setTitle("Konfirmasi Pendaftaran");
-                        confirmation.setHeaderText(null);
-                        confirmation.setContentText("Apakah kamu yakin ingin mendaftar ke klub ini?");
-
-                        confirmation.showAndWait().ifPresent(response -> {
-                            if (response == ButtonType.OK) {
-                                registerToClub(conn, name);
-                            }
-                        });
-                    });
-                    actionContainer.getChildren().add(joinButton);
-                }
-
-                Label nameLabel = new Label("Nama Club: " + name);
-                nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-                Label descLabel = new Label("Deskripsi: " + description);
-                descLabel.setWrapText(true);
-
-                Label yearLabel = new Label("Tahun Berdiri: " + year);
-
-                infoContainer.getChildren().addAll(nameLabel, descLabel, yearLabel);
+                // Setelah detail klub dimuat, periksa apakah user sudah menjadi anggota
+                checkMembershipStatus();
             } else {
-                showError("Klub Tidak Ditemukan", "Klub dengan ID " + clubID + " tidak ditemukan.");
+                showError("Klub Tidak Ditemukan", "Klub dengan ID " + this.clubId + " tidak ditemukan.");
             }
+
         } catch (SQLException e) {
-            showError("Error Database", e.getMessage());
+            e.printStackTrace();
+            showError("Kesalahan Database", "Gagal memuat detail klub: " + e.getMessage());
         }
     }
 
-    private boolean isUserMember(Connection conn) throws SQLException {
-        String query = "SELECT * FROM keanggotaan WHERE nrp = ? AND id_club = ?";
-        PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.setString(1, nrp);
-        stmt.setInt(2, clubID);
-        ResultSet rs = stmt.executeQuery();
-        return rs.next();
+    /**
+     * Memeriksa apakah pengguna yang sedang login sudah menjadi anggota klub ini atau belum,
+     * lalu menampilkan tombol "Daftar" atau label status yang sesuai.
+     */
+    private void checkMembershipStatus() {
+        // --- PERBAIKAN PENTING: Gunakan UserSession ---
+        String loggedInNrp = UserSession.getLoggedInNrp();
+        if (loggedInNrp == null || !UserSession.isLoggedIn()) {
+            showError("Sesi Tidak Valid", "Tidak dapat memverifikasi pengguna. Silakan login kembali.");
+            return;
+        }
+
+        String query = "SELECT 1 FROM keanggotaan WHERE nrp = ? AND id_club = ?";
+        boolean isMember = false;
+
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, loggedInNrp);
+            pstmt.setInt(2, this.clubId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    isMember = true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("Kesalahan Database", "Gagal memeriksa status keanggotaan: " + e.getMessage());
+            return; // Keluar jika terjadi error
+        }
+
+        // Tampilkan UI yang sesuai berdasarkan status keanggotaan
+        updateActionUI(isMember);
     }
 
-    private void registerToClub(Connection conn, String name) {
-        try {
-            String insert = "INSERT INTO keanggotaan (nrp, id_club, tanggal_gabung, status, peran) " +
-                    "VALUES (?, ?, CURRENT_DATE, 'Aktif', 'anggota')";
-            PreparedStatement stmt = conn.prepareStatement(insert);
-            stmt.setString(1, nrp);
-            stmt.setInt(2, clubID);
-            stmt.executeUpdate();
+    /**
+     * Memperbarui UI di dalam actionContainer.
+     * @param isMember true jika pengguna adalah anggota, false jika bukan.
+     */
+    private void updateActionUI(boolean isMember) {
+        actionContainer.getChildren().clear(); // Bersihkan container sebelum menambahkan elemen baru
 
-            actionContainer.getChildren().clear();
-            Label successLabel = new Label("Sudah terdaftar");
-            successLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: green;");
-            actionContainer.getChildren().add(successLabel);
+        if (isMember) {
+            Label alreadyJoinedLabel = new Label("Anda sudah terdaftar");
+            alreadyJoinedLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: green;");
+            actionContainer.getChildren().add(alreadyJoinedLabel);
+        } else {
+            Button joinButton = new Button("Gabung Klub Ini");
+            joinButton.setStyle("-fx-font-size: 14px; -fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-weight: bold;");
+            joinButton.setOnAction(event -> handleJoinClubAction());
+            actionContainer.getChildren().add(joinButton);
+        }
+    }
 
-            Alert success = new Alert(Alert.AlertType.INFORMATION);
-            success.setTitle("Pendaftaran Sukses!");
-            success.setHeaderText(null);
-            success.setContentText("Berhasil mendaftar ke " + name + " sebagai anggota!");
-            success.showAndWait();
+    /**
+     * Dijalankan ketika tombol "Gabung Klub Ini" diklik.
+     */
+    private void handleJoinClubAction() {
+        // Tampilkan dialog konfirmasi
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Konfirmasi Pendaftaran");
+        confirmation.setHeaderText("Mendaftar ke " + this.clubName);
+        confirmation.setContentText("Apakah Anda yakin ingin bergabung dengan klub ini?");
+
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            // Jika pengguna menekan OK, lanjutkan proses registrasi
+            registerUserToClub();
+        }
+    }
+
+    /**
+     * Proses memasukkan data pendaftaran pengguna ke tabel 'keanggotaan'.
+     */
+    private void registerUserToClub() {
+        String loggedInNrp = UserSession.getLoggedInNrp();
+        if (loggedInNrp == null) {
+            showError("Error", "Sesi pengguna tidak ditemukan.");
+            return;
+        }
+
+        String query = "INSERT INTO keanggotaan (nrp, id_club, peran, tanggal_gabung, status) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnector.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, loggedInNrp);
+            pstmt.setInt(2, this.clubId);
+            pstmt.setString(3, "Anggota"); // Peran default
+            pstmt.setDate(4, java.sql.Date.valueOf(LocalDate.now())); // Tanggal hari ini
+            pstmt.setString(5, "Aktif"); // Status default
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                showAlert(Alert.AlertType.INFORMATION, "Pendaftaran Berhasil!", "Selamat! Anda telah berhasil terdaftar di " + this.clubName + ".");
+                // Perbarui UI untuk menampilkan status "Sudah terdaftar"
+                updateActionUI(true);
+            }
+
         } catch (SQLException e) {
-            showError("Error Registrasi", e.getMessage());
+            if (e.getSQLState().equals("23505")) { // Handle unique constraint violation
+                showError("Pendaftaran Gagal", "Anda sudah terdaftar di klub ini.");
+                updateActionUI(true); // Perbarui UI juga jika ternyata sudah terdaftar
+            } else {
+                e.printStackTrace();
+                showError("Kesalahan Registrasi", "Terjadi kesalahan database: " + e.getMessage());
+            }
         }
     }
 
     private Image loadImage(String imagePath) {
         InputStream imageStream = null;
-
         if (imagePath != null && !imagePath.trim().isEmpty()) {
             imageStream = getClass().getResourceAsStream("/images/" + imagePath);
-            if (imageStream == null) {
-                System.err.println("Image not found: " + imagePath);
-            }
         }
-
         if (imageStream == null) {
             imageStream = getClass().getResourceAsStream("/images/image-not-found.png");
             if (imageStream == null) {
-                showError("Image", "Fallback image tidak ditemukan");
-                throw new RuntimeException("Fallback image not found");
+                throw new RuntimeException("Krisis! Gambar fallback 'image-not-found.png' tidak ditemukan.");
             }
         }
-
         return new Image(imageStream);
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-
-    @FXML
-    public void initialize() {
-        actionContainer.getChildren().clear();
-        infoContainer.getChildren().clear();
+    private void showError(String title, String message) {
+        showAlert(Alert.AlertType.ERROR, title, message);
     }
 }
