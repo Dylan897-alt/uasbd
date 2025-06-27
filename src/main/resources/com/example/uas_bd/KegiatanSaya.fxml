@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<!-- (DIUBAH) Root container sekarang menggunakan BorderPane -->
+<BorderPane fx:controller="com.example.uas_bd.KegiatanSayaController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <left>
+        <!-- (BARU) Navbar ditambahkan di sebelah kiri -->
+        <VBox prefWidth="120.0" style="-fx-background-color: #333333;" BorderPane.alignment="CENTER">
+            <children>
+                <fx:include source="navbar.fxml" />
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <!-- Konten asli Anda sekarang berada di tengah -->
+        <VBox fx:id="rootVBox" alignment="TOP_CENTER" spacing="15.0" style="-fx-background-color: #f9f9f9;" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <Label text="Riwayat Kegiatan Saya">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+                <Label text="Berikut adalah daftar kegiatan yang pernah Anda ikuti beserta status kehadiran Anda." textAlignment="CENTER" wrapText="true" />
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="kegiatanContainer" spacing="15.0">
+                            <padding>
+                                <Insets top="10.0" />
+                            </padding>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>
