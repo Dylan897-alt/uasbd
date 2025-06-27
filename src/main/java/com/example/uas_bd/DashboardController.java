@@ -62,6 +62,11 @@ public class DashboardController {
         loadScene(event, "KegiatanSaya.fxml");
     }
 
+    @FXML
+    private void handleSertifikat(ActionEvent event) {
+        loadScene(event, "sertifikat.fxml");
+    }
+
     private void loadScene(ActionEvent event, String fxmlFile) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));

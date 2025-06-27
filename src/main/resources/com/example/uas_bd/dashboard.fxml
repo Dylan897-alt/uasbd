@@ -62,7 +62,7 @@
                                           style="-fx-background-color: #E0E0E0; -fx-padding: 12; -fx-background-radius: 6;"
                                           prefWidth="180" prefHeight="100"
                                           GridPane.rowIndex="1" GridPane.columnIndex="1">
-                                        <Button text="Coming Soon" disable="true" prefWidth="150"/>
+                                        <Button text="Sertifikat" onAction="#handleSertifikat" prefWidth="150"/>
                                     </VBox>
                                 </GridPane>
                             </children>
