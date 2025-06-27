@@ -7,7 +7,7 @@
     <children>
         <Button fx:id="dashboardButton" onAction="#onDashboardClick" prefHeight="26.0" prefWidth="120.0" text="Dashboard" />
         <Button fx:id="clubsButton" onAction="#onEditClubsCLick" prefHeight="26.0" prefWidth="120.0" text="Edit Clubs" />
-        <Button fx:id="myClubsButton" onAction="#onKegiatanClick" prefHeight="26.0" prefWidth="120.0" text="Kegiatan" />
+        <Button fx:id="myClubsButton" onAction="#onKegiatanClick" prefHeight="26.0" prefWidth="120.0" text="Tambah Kegiatan" />
         <Button fx:id="logoutButton" onAction="#onLogoutClick" prefHeight="26.0" prefWidth="120.0" text="Logout" />
     </children>
 </VBox>

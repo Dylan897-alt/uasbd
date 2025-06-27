@@ -32,11 +32,11 @@ public class NavbarPengurusController {
     }
 
     public void onEditClubsCLick(ActionEvent event) throws IOException {
-        switchScene(event, "clubs.fxml");
+        switchScene(event, "edit-club.fxml");
     }
 
     public void onKegiatanClick(ActionEvent event) throws IOException{
-        switchScene(event, "my-clubs.fxml");
+        switchScene(event, "kegiatan-baru.fxml");
     }
 
     public void onLogoutClick(ActionEvent event) throws IOException{
