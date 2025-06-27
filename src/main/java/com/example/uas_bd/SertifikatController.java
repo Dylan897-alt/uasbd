@@ -20,8 +20,7 @@ public class SertifikatController {
     }
 
     private void loadSertifikat() {
-//        String nrp = UserSession.getLoggedInNrp();
-        String nrp = "c14240039";
+        String nrp = UserSession.getLoggedInNrp();
         String sql = """
             SELECT p.no_sertif, k.nama_kegiatan, c.nama_club
             FROM presensi p
