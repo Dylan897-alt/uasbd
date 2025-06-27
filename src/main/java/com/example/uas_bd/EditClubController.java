@@ -70,7 +70,7 @@ public class EditClubController {
                     confirmation.setHeaderText(null);
                     confirmation.setContentText("Apakah kamu yakin ingin menghapus " + name + "?");
                     confirmation.showAndWait().ifPresent(response -> {
-                        if (response.getButtonData().isDefaultButton()) {
+                        if (response == ButtonType.OK) {
                             deleteClub(id);
                         }
                     });
@@ -124,7 +124,7 @@ public class EditClubController {
         confirmation.setHeaderText(null);
         confirmation.setContentText("Apakah kamu yakin membuat klub ini?");
         confirmation.showAndWait().ifPresent(response -> {
-            if (response.getButtonData().isDefaultButton()) {
+            if (response == ButtonType.OK) {
                 try (Connection conn = DatabaseConnector.connect()) {
                     PreparedStatement stmt = conn.prepareStatement(
                             "INSERT INTO club (nama_club, deskripsi, tahun_berdiri, image_path, id_kategori) VALUES (?, ?, ?, ?, ?)"
@@ -178,7 +178,7 @@ public class EditClubController {
         confirmation.setHeaderText(null);
         confirmation.setContentText("Apakah kamu yakin update klub ini?");
         confirmation.showAndWait().ifPresent(response -> {
-            if (response.getButtonData().isDefaultButton()) {
+            if (response == ButtonType.OK) {
                 try (Connection conn = DatabaseConnector.connect()) {
                     PreparedStatement stmt = conn.prepareStatement(
                             "UPDATE club SET nama_club=?, deskripsi=?, tahun_berdiri=?, image_path=?, id_kategori=? WHERE id_club=?"

@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,7 +22,7 @@ import java.sql.*;
 
 public class ClubDetailController {
     private int clubID;
-    private final String loggedInNrp = "c14240058";
+    private final String nrp = UserSession.getLoggedInNrp();
 
     @FXML
     private ImageView clubImage;
@@ -54,10 +55,8 @@ public class ClubDetailController {
                 int year = rs.getInt("tahun_berdiri");
                 String imagePath = rs.getString("image_path");
 
-                // Set image
                 clubImage.setImage(loadImage(imagePath));
 
-                // Display action button or status
                 if (isUserMember(conn)) {
                     Label alreadyJoined = new Label("Sudah terdaftar");
                     alreadyJoined.setStyle("-fx-font-size: 14px; -fx-text-fill: green;");
@@ -71,7 +70,7 @@ public class ClubDetailController {
                         confirmation.setContentText("Apakah kamu yakin ingin mendaftar ke klub ini?");
 
                         confirmation.showAndWait().ifPresent(response -> {
-                            if (response.getButtonData().isDefaultButton()) {
+                            if (response == ButtonType.OK) {
                                 registerToClub(conn, name);
                             }
                         });
@@ -99,7 +98,7 @@ public class ClubDetailController {
     private boolean isUserMember(Connection conn) throws SQLException {
         String query = "SELECT * FROM keanggotaan WHERE nrp = ? AND id_club = ?";
         PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.setString(1, loggedInNrp);
+        stmt.setString(1, nrp);
         stmt.setInt(2, clubID);
         ResultSet rs = stmt.executeQuery();
         return rs.next();
@@ -110,7 +109,7 @@ public class ClubDetailController {
             String insert = "INSERT INTO keanggotaan (nrp, id_club, tanggal_gabung, status, peran) " +
                     "VALUES (?, ?, CURRENT_DATE, 'Aktif', 'anggota')";
             PreparedStatement stmt = conn.prepareStatement(insert);
-            stmt.setString(1, loggedInNrp);
+            stmt.setString(1, nrp);
             stmt.setInt(2, clubID);
             stmt.executeUpdate();
 

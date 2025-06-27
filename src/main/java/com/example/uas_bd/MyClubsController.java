@@ -13,9 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
@@ -32,7 +29,8 @@ public class MyClubsController {
     }
 
     private void loadClubsFromDatabase() {
-        String nrp = "c14240058";
+        String nrp = UserSession.getLoggedInNrp();
+        System.out.println(nrp);
         Connection conn = DatabaseConnector.connect();
         if (conn == null) {
             showError("Error Database", "Gagal connect ke database. Cek settingnya.");
@@ -166,7 +164,7 @@ public class MyClubsController {
         VBox card = new VBox(5);
         card.setStyle("-fx-border-color: lightgray; -fx-border-radius: 5; -fx-padding: 10;");
 
-        Label messageLabel = new Label("You haven't joined a club.");
+        Label messageLabel = new Label("Kamu belum masuk ke klub manapun.");
         messageLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: gray;");
         messageLabel.setWrapText(true);
 
