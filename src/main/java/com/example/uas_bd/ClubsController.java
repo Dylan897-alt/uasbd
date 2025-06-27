@@ -121,7 +121,7 @@ public class ClubsController {
      */
     private void navigateToClubDetail(int clubID, Node sourceNode) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ClubDetail.fxml")); // Pastikan nama file FXML benar
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("club-detail.fxml")); // Pastikan nama file FXML benar
             Parent root = loader.load();
 
             // Mengambil controller dari halaman detail untuk mengirimkan ID klub
