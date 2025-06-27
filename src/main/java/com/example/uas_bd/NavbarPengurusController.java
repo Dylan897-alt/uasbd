@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class NavbarController {
+public class NavbarPengurusController {
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -31,11 +31,11 @@ public class NavbarController {
         switchScene(event, "dashboard.fxml");
     }
 
-    public void onClubsClick(ActionEvent event) throws IOException {
+    public void onEditClubsCLick(ActionEvent event) throws IOException {
         switchScene(event, "clubs.fxml");
     }
 
-    public void onMyClubsClick(ActionEvent event) throws IOException{
+    public void onKegiatanClick(ActionEvent event) throws IOException{
         switchScene(event, "my-clubs.fxml");
     }
 

@@ -20,6 +20,7 @@ public class EditClubController {
     @FXML
     private ComboBox<CategoryItem> categoryComboBox;
 
+    private String nrp;
     private int editingClubId = -1;
 
     public static class CategoryItem{
@@ -43,6 +44,8 @@ public class EditClubController {
 
     @FXML
     public void initialize() {
+        this.nrp = "c14240058";
+//        this.nrp = UserSession.getLoggedInNrp();
         loadCategories();
         loadClubs();
     }
@@ -50,7 +53,15 @@ public class EditClubController {
     private void loadClubs() {
         clubListContainer.getChildren().clear();
         try (Connection conn = DatabaseConnector.connect()) {
-            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM club");
+            String sql = """
+    SELECT c.*
+    FROM club c
+    JOIN keanggotaan k ON c.id_club = k.id_club
+    WHERE k.nrp = ? AND k.peran = 'pengurus'
+""";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nrp);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id_club");
                 String name = rs.getString("nama_club");
@@ -101,6 +112,7 @@ public class EditClubController {
         String yearText = yearField.getText();
         String image = imageField.getText();
         CategoryItem selectedCategory = categoryComboBox.getValue();
+
         if (name.isBlank()) {
             showError("Error Validasi", "Nama klub tidak boleh kosong.");
             return;
@@ -126,15 +138,33 @@ public class EditClubController {
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 try (Connection conn = DatabaseConnector.connect()) {
-                    PreparedStatement stmt = conn.prepareStatement(
-                            "INSERT INTO club (nama_club, deskripsi, tahun_berdiri, image_path, id_kategori) VALUES (?, ?, ?, ?, ?)"
-                    );
+                    // Insert the club and return the id_club
+                    String clubSql = """
+                    INSERT INTO club (nama_club, deskripsi, tahun_berdiri, image_path, id_kategori)
+                    VALUES (?, ?, ?, ?, ?)
+                    RETURNING id_club
+                """;
+                    PreparedStatement stmt = conn.prepareStatement(clubSql);
                     stmt.setString(1, name);
                     stmt.setString(2, desc);
                     stmt.setInt(3, year);
                     stmt.setString(4, image);
                     stmt.setInt(5, selectedCategory.getId());
-                    stmt.executeUpdate();
+
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        int clubId = rs.getInt("id_club");
+
+                        String anggotaSql = """
+                        INSERT INTO keanggotaan (nrp, id_club, tanggal_gabung, status, peran)
+                        VALUES (?, ?, CURRENT_DATE, 'Aktif', 'pengurus')
+                    """;
+                        PreparedStatement anggotaStmt = conn.prepareStatement(anggotaSql);
+                        anggotaStmt.setString(1, nrp);
+                        anggotaStmt.setInt(2, clubId);
+                        anggotaStmt.executeUpdate();
+                    }
+
                     clearForm();
                     showInfo("Sukses!", "Berhasil membuat " + name);
                     loadClubs();
@@ -144,6 +174,7 @@ public class EditClubController {
             }
         });
     }
+
 
     @FXML
     private void handleUpdate() {
