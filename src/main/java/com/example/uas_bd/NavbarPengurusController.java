@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.io.IOException;
 public class NavbarPengurusController {
 
     public void onDashboardClick(ActionEvent event) {
-        navigate(event, "pengurus-dashboard.fxml");
+        navigate(event, "pengurusDashboard.fxml");
     }
 
     public void onEditClubsClick(ActionEvent event) {
@@ -23,9 +25,21 @@ public class NavbarPengurusController {
         navigate(event, "kegiatan-baru.fxml");
     }
 
+    public void onManageClubClick(ActionEvent event) {
+        navigate(event, "manage-presensi.fxml");
+    }
+
     public void onLogoutClick(ActionEvent event) {
-        UserSession.clearSession(); // hapus sesi login
-        navigate(event, "login.fxml");
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Konfirmasi Logout");
+        confirmation.setHeaderText(null);
+        confirmation.setContentText("Apakah kamu ingin log out?");
+
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                navigate(event, "login.fxml");
+            }
+        });
     }
 
     private void navigate(ActionEvent event, String fxmlFile) {

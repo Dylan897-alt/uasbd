@@ -38,14 +38,14 @@ public class KegiatanListController {
     // Nanti ini akan didapatkan dari objek sesi pengguna setelah login berhasil
     private String currentUserRole = "Anggota"; // Default atau ambil dari sesi
 
-    // Database Configuration
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData"; // Ganti
-    private static final String DB_USER = "postgres"; // Ganti
-    private static final String DB_PASS = "Untukkuliah123"; // Ganti
+//    // Database Configuration
+//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData"; // Ganti
+//    private static final String DB_USER = "postgres"; // Ganti
+//    private static final String DB_PASS = "Untukkuliah123"; // Ganti
 
-//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
-//    private static final String DB_USER = "postgres";
-//    private static final String DB_PASS = "Dylan030506";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
+    private static final String DB_USER = "postgres";
+    private static final String DB_PASS = "Dylan030506";
 
 //    private static final String DB_URL = "jdbc:postgresql://localhost:5432/HR BD A";
 //    private static final String DB_USER = "postgres";
