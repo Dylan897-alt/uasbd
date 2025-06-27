@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<HBox fx:controller="com.example.uas_bd.ProfileController"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      prefHeight="400.0" prefWidth="600.0"
+      maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity">
+
+    <children>
+        <fx:include source="navbar.fxml" />
+
+        <ScrollPane fitToWidth="true"
+                    vbarPolicy="AS_NEEDED"
+                    hbarPolicy="NEVER"
+                    prefHeight="400.0" prefWidth="480.0">
+            <content>
+                <AnchorPane fx:id="profilePane"
+                            prefHeight="800.0" prefWidth="480.0">
+                    <!-- Tambahkan isi tampilan profile di sini -->
+                </AnchorPane>
+            </content>
+        </ScrollPane>
+    </children>
+</HBox>
