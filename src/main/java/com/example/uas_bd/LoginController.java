@@ -164,12 +164,11 @@ public class LoginController {
 
     private void navigateToDashboard(String role) {
         try {
-            String fxmlPath = "";
+            String fxmlPath = "dashboard.fxml";
             if ("Anggota".equals(role)) {
-//                fxmlPath = "/path/to/AnggotaDashboard.fxml";
-                fxmlPath = "clubs.fxml";
+                fxmlPath = "dashboard.fxml";
             } else if ("Pengurus".equals(role)) {
-                fxmlPath = "/path/to/PengurusDashboard.fxml";
+                fxmlPath = "PengurusDashboard.fxml";
             }
 
             if (!fxmlPath.isEmpty()) {

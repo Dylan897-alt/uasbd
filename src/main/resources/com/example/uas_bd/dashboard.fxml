@@ -1,59 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.ScrollPane?>
 
-<HBox fx:controller="com.example.uas_bd.DashboardController"
-      xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      prefHeight="600.0" prefWidth="800.0">
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.uas_bd.DashboardController"
+            prefWidth="800" prefHeight="600">
     <children>
+        <GridPane layoutX="50.0" layoutY="50.0" hgap="30" vgap="30">
+            <!-- Kotak 1: Profile -->
+            <VBox style="-fx-background-color: #d1e7dd; -fx-padding: 20;" prefWidth="300" prefHeight="150">
+                <Label text="Profil" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+                <Button text="Lihat Profil" onAction="#handleLihatProfil" />
+            </VBox>
 
-        <!-- Sidebar / Navbar -->
-        <fx:include source="navbar.fxml" />
+            <!-- Kotak 2: Kegiatan -->
+            <VBox style="-fx-background-color: #fff3cd; -fx-padding: 20;" prefWidth="300" prefHeight="150" GridPane.columnIndex="1">
+                <Label text="Kegiatan" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+                <Label text="(Belum ada data)" />
+            </VBox>
 
-        <!-- Main Content Area -->
-        <ScrollPane fitToWidth="true" vbarPolicy="AS_NEEDED" hbarPolicy="NEVER" prefHeight="600.0" prefWidth="600.0">
-            <content>
-                <AnchorPane prefWidth="600.0" prefHeight="800.0">
-                    <children>
-                        <VBox spacing="20.0" layoutX="20.0" layoutY="20.0">
-                            <!-- Judul Dashboard -->
-                            <Label text="Dashboard Utama" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+            <!-- Kotak 3: Sertifikat -->
+            <VBox style="-fx-background-color: #cfe2ff; -fx-padding: 20;" prefWidth="300" prefHeight="150" GridPane.rowIndex="1">
+                <Label text="Sertifikat" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+                <Label text="(Belum tersedia)" />
+            </VBox>
 
-                            <!-- Statistik -->
-                            <HBox spacing="15.0">
-                                <VBox style="-fx-background-color: #d1e7dd; -fx-padding: 10;" prefWidth="150.0" prefHeight="80.0">
-                                    <Label text="Jumlah Mahasiswa" style="-fx-font-weight: bold;" />
-                                    <Label fx:id="jumlahMahasiswaLabel" text="0" />
-                                </VBox>
-                                <VBox style="-fx-background-color: #f8d7da; -fx-padding: 10;" prefWidth="150.0" prefHeight="80.0">
-                                    <Label text="Jumlah Club" style="-fx-font-weight: bold;" />
-                                    <Label fx:id="jumlahClubLabel" text="0" />
-                                </VBox>
-                            </HBox>
-
-                            <!-- Tombol Aksi -->
-                            <HBox spacing="10.0">
-                                <Button text="Tambah Data" onAction="#handleTambahData" />
-                                <Button text="Refresh" onAction="#handleRefresh" />
-                            </HBox>
-
-                            <!-- Placeholder Daftar -->
-                            <VBox spacing="10.0">
-                                <Label text="Daftar Terbaru" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-                                <VBox fx:id="daftarContainer" spacing="5.0">
-                                    <!-- Data bisa ditambahkan secara dinamis lewat controller -->
-                                </VBox>
-                            </VBox>
-                        </VBox>
-                    </children>
-                </AnchorPane>
-            </content>
-        </ScrollPane>
+            <!-- Kotak 4: Placeholder -->
+            <VBox style="-fx-background-color: #f8d7da; -fx-padding: 20;" prefWidth="300" prefHeight="150" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Label text="Fitur Lainnya" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+                <Label text="(Dalam pengembangan)" />
+            </VBox>
+        </GridPane>
     </children>
-</HBox>
+</AnchorPane>
