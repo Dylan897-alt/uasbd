@@ -5,13 +5,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnector {
-//    private static final String URL = "jdbc:postgresql://localhost:5432/uas_bd";
-//    private static final String USER = "postgres";
-//    private static final String PASSWORD = "Dylan030506";
-
-    private static final String URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
+    private static final String URL = "jdbc:postgresql://localhost:5432/uas_bd";
     private static final String USER = "postgres";
-    private static final String PASSWORD = "Untukkuliah123";
+    private static final String PASSWORD = "Dylan030506";
+
+//    private static final String URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
+//    private static final String USER = "postgres";
+//    private static final String PASSWORD = "Untukkuliah123";
 
     public static Connection connect() {
         try {

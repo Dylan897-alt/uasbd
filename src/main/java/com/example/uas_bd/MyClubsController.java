@@ -101,17 +101,23 @@ public class MyClubsController {
      * Direfaktor dari ClubsController untuk konsistensi.
      */
     private HBox createClubVisualBox(int clubID, String name, String description, int year, String imagePath) {
-        HBox clubBox = new HBox(20);
+        HBox clubBox = new HBox(20); // same spacing as ClubsController
         clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: white;");
         clubBox.setAlignment(Pos.CENTER_LEFT);
 
-        // --- PERBAIKAN 4: Menggunakan metode navigasi yang benar ---
+        // Navigation + hover effects
         clubBox.setOnMouseClicked(event -> navigateToClubDetail(clubID, (Node) event.getSource()));
         clubBox.setOnMouseEntered(e -> clubBox.setStyle("-fx-border-color: #0078D7; -fx-border-width: 2; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: #f0f8ff; -fx-effect: dropshadow(three-pass-box, rgba(0,120,215,0.3), 10, 0, 0, 0);"));
         clubBox.setOnMouseExited(e -> clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: white;"));
 
-        clubBox.getChildren().add(createImageView(imagePath));
+        // Image
+        ImageView imageView = createImageView(imagePath);
+        imageView.setFitHeight(100);
+        imageView.setFitWidth(100);
+        imageView.setPreserveRatio(true);
+        clubBox.getChildren().add(imageView);
 
+        // Text
         VBox textContainer = new VBox(5);
         textContainer.setAlignment(Pos.CENTER_LEFT);
 
@@ -131,13 +137,14 @@ public class MyClubsController {
         return clubBox;
     }
 
+
     /**
      * Logika untuk berpindah dari halaman ini ke halaman detail klub.
      * Memastikan memanggil metode yang benar di ClubDetailController.
      */
     private void navigateToClubDetail(int clubID, Node sourceNode) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ClubDetail.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("club-detail.fxml"));
             Parent root = loader.load();
 
             ClubDetailController controller = loader.getController();
