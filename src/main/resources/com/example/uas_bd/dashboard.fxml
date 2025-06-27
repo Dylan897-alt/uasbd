@@ -3,60 +3,73 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox xmlns="http://javafx.com/javafx/23.0.1"
+<HBox xmlns="http://javafx.com/javafx/17.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.uas_bd.DashboardController"
       prefHeight="400.0" prefWidth="600.0">
 
     <children>
-        <!-- Sidebar -->
+        <!-- Sidebar navbar -->
         <fx:include source="navbar.fxml"/>
 
-        <!-- Main Area -->
-        <AnchorPane prefWidth="480.0" prefHeight="400.0">
-            <children>
-                <!-- Selamat Datang -->
-                <Label fx:id="welcomeLabel"
-                       layoutX="30.0"
-                       layoutY="20.0"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <!-- Main Dashboard Area -->
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="NEVER"
+                    prefWidth="480.0" prefHeight="400.0">
+            <content>
+                <AnchorPane prefHeight="800.0" prefWidth="480.0">
+                    <children>
+                        <VBox layoutX="20.0" layoutY="20.0" spacing="20.0">
+                            <children>
 
-                <!-- Grid Menu -->
-                <GridPane layoutX="30.0" layoutY="60.0" hgap="20.0" vgap="20.0">
-                    <!-- Kartu 1 -->
-                    <VBox spacing="8.0" style="-fx-background-color: #E1F5FE; -fx-padding: 12; -fx-background-radius: 6;"
-                          prefWidth="180" prefHeight="100"
-                          GridPane.rowIndex="0" GridPane.columnIndex="0">
-                        <Button text="Lihat Profil" onAction="#handleLihatProfil" prefWidth="150"/>
-                    </VBox>
+                                <!-- Welcome Label -->
+                                <Label fx:id="welcomeLabel" text="Selamat datang!"
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold;" />
 
-                    <!-- Kartu 2 -->
-                    <VBox spacing="8.0" style="-fx-background-color: #FFF9C4; -fx-padding: 12; -fx-background-radius: 6;"
-                          prefWidth="180" prefHeight="100"
-                          GridPane.rowIndex="0" GridPane.columnIndex="1">
-                        <Button text="Lihat Kegiatan" onAction="#handleLihatKegiatan" prefWidth="150"/>
-                    </VBox>
+                                <!-- Grid untuk Kartu -->
+                                <GridPane hgap="20.0" vgap="20.0">
+                                    <!-- Kartu: Lihat Profil -->
+                                    <VBox spacing="8.0"
+                                          style="-fx-background-color: #E1F5FE; -fx-padding: 12; -fx-background-radius: 6;"
+                                          prefWidth="180" prefHeight="100"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="0">
+                                        <Button text="Lihat Profil" onAction="#handleLihatProfil" prefWidth="150"/>
+                                    </VBox>
 
-                    <!-- Kartu 3 -->
-                    <VBox spacing="8.0" style="-fx-background-color: #EDE7F6; -fx-padding: 12; -fx-background-radius: 6;"
-                          prefWidth="180" prefHeight="100"
-                          GridPane.rowIndex="1" GridPane.columnIndex="0">
-                        <Button text="Sertifikat (Coming Soon)" disable="true" prefWidth="150"/>
-                    </VBox>
+                                    <!-- Kartu: Lihat Kegiatan -->
+                                    <VBox spacing="8.0"
+                                          style="-fx-background-color: #FFF9C4; -fx-padding: 12; -fx-background-radius: 6;"
+                                          prefWidth="180" prefHeight="100"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                        <Button text="Lihat Kegiatan" onAction="#handleLihatKegiatan" prefWidth="150"/>
+                                    </VBox>
 
-                    <!-- Kartu 4 -->
-                    <VBox spacing="8.0" style="-fx-background-color: #FFCDD2; -fx-padding: 12; -fx-background-radius: 6;"
-                          prefWidth="180" prefHeight="100"
-                          GridPane.rowIndex="1" GridPane.columnIndex="1">
-                        <Button text="Coming Soon" disable="true" prefWidth="150"/>
-                    </VBox>
-                </GridPane>
-            </children>
-        </AnchorPane>
+                                    <!-- Kartu: Kegiatan Saya -->
+                                    <VBox spacing="8.0"
+                                          style="-fx-background-color: #C8E6C9; -fx-padding: 12; -fx-background-radius: 6;"
+                                          prefWidth="180" prefHeight="100"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="0">
+                                        <Button text="Kegiatan Saya" onAction="#handleKegiatanSaya" prefWidth="150"/>
+                                    </VBox>
+
+                                    <!-- Placeholder -->
+                                    <VBox spacing="8.0"
+                                          style="-fx-background-color: #E0E0E0; -fx-padding: 12; -fx-background-radius: 6;"
+                                          prefWidth="180" prefHeight="100"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="1">
+                                        <Button text="Coming Soon" disable="true" prefWidth="150"/>
+                                    </VBox>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+            </content>
+        </ScrollPane>
     </children>
 </HBox>

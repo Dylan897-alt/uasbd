@@ -12,6 +12,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.*;
 
+/**
+ * Controller untuk halaman Dashboard utama.
+ * Menampilkan welcome message dan navigasi ke halaman lain.
+ */
 public class DashboardController {
 
     @FXML
@@ -20,11 +24,14 @@ public class DashboardController {
     @FXML
     public void initialize() {
         String nrp = UserSession.getLoggedInNrp();
+
         if (nrp != null) {
             try (Connection conn = DatabaseConnector.connect();
                  PreparedStatement stmt = conn.prepareStatement("SELECT nama FROM mahasiswa WHERE nrp = ?")) {
+
                 stmt.setString(1, nrp);
                 ResultSet rs = stmt.executeQuery();
+
                 if (rs.next()) {
                     String nama = rs.getString("nama");
                     welcomeLabel.setText("Selamat datang, " + nama + "!");
@@ -42,25 +49,28 @@ public class DashboardController {
 
     @FXML
     private void handleLihatProfil(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("profile.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadScene(event, "profile.fxml");
     }
 
     @FXML
     private void handleLihatKegiatan(ActionEvent event) {
+        loadScene(event, "KegiatanList.fxml");
+    }
+
+    @FXML
+    private void handleKegiatanSaya(ActionEvent event) {
+        loadScene(event, "KegiatanSaya.fxml");
+    }
+
+    private void loadScene(ActionEvent event, String fxmlFile) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("KegiatanList.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root = loader.load();
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
