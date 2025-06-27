@@ -50,13 +50,13 @@ public class LoginController {
     private Label cautionLabel;
     @FXML
     private ComboBox<String> roleComboBox;
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
-    private static final String DB_USER = "postgres";
-    private static final String DB_PASS = "Dylan030506";
-
-//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/HR BD A";
+//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
 //    private static final String DB_USER = "postgres";
-//    private static final String DB_PASS = "POSTGRESSQL";
+//    private static final String DB_PASS = "Dylan030506";
+
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/HR BD A";
+    private static final String DB_USER = "postgres";
+    private static final String DB_PASS = "POSTGRESSQL";
 //    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
 //    private static final String DB_USER = "postgres";
 //    private static final String DB_PASS = "Untukkuliah123";
@@ -164,12 +164,11 @@ public class LoginController {
 
     private void navigateToDashboard(String role) {
         try {
-            String fxmlPath = "";
+            String fxmlPath = "dashboard.fxml";
             if ("Anggota".equals(role)) {
-//                fxmlPath = "/path/to/AnggotaDashboard.fxml";
                 fxmlPath = "dashboard.fxml";
             } else if ("Pengurus".equals(role)) {
-                fxmlPath = "/path/to/PengurusDashboard.fxml";
+                fxmlPath = "PengurusDashboard.fxml";
             }
 
             if (!fxmlPath.isEmpty()) {
