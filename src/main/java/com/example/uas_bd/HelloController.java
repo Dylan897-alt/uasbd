@@ -20,15 +20,15 @@ public class HelloController {
         Connection conn = DatabaseConnector.connect();
         if (conn != null) {
             welcomeText.setText("✅ Connected to PostgreSQL!");
-            String query = "SELECT kota FROM stasiun WHERE kode_stasiun = ?";
+            String query = "SELECT first_name FROM employees WHERE employee_id = ?";
 
             try {
                 PreparedStatement stmt = conn.prepareStatement(query);
-                stmt.setString(1, "3");
+                stmt.setInt(1, 101);
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs.next()) {
-                    String kota = rs.getString("kota");
+                    String kota = rs.getString("first_name");
                     queryResultText.setText(kota);  // SET TEXT TO NEW LABEL
                 } else {
                     queryResultText.setText("No user found.");
