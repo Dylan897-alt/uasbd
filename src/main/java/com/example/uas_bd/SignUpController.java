@@ -43,9 +43,13 @@ public class SignUpController {
 //    private static final String DB_URL = "jdbc:postgresql://localhost:5432/Project_1_BasisData";
 //    private static final String DB_USER = "postgres";
 //    private static final String DB_PASS = "Untukkuliah123";
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
+//    private static final String DB_URL = "jdbc:postgresql://localhost:5432/uas_bd";
+//    private static final String DB_USER = "postgres";
+//    private static final String DB_PASS = "Dylan030506";
+
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/HR BD A";
     private static final String DB_USER = "postgres";
-    private static final String DB_PASS = "Dylan030506";
+    private static final String DB_PASS = "POSTGRESSQL";
 
     @FXML
     public void initialize() {

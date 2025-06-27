@@ -15,7 +15,7 @@ public class KegiatanBaruController {
 
     @FXML
     private void handleSimpan() {
-        try (Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/hr_bd_a", "username", "password")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/HR BD A", "postgres", "POSTGRESSQL")) {
 
             String nama = namaKegiatanField.getText();
             String lokasi = lokasiField.getText();
