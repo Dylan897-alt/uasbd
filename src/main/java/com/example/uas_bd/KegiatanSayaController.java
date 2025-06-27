@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * Controller untuk halaman "Kegiatan Saya".
@@ -44,8 +45,10 @@ public class KegiatanSayaController {
             return;
         }
 
-        // Query JOIN untuk mendapatkan semua data yang diperlukan dalam satu kali jalan
+        // --- QUERY DIPERBARUI ---
+        // Menambahkan pengambilan waktu_mulai, waktu_selesai, dan lokasi
         String query = "SELECT kg.nama_kegiatan, c.nama_club, kg.tanggal, " +
+                "kg.waktu_mulai, kg.waktu_selesai, kg.lokasi, " +
                 "COALESCE(p.status_kehadiran, 'Belum direkap') AS status_presensi " +
                 "FROM registrasi r " +
                 "JOIN kegiatan_club kg ON r.id_kegiatan = kg.id_kegiatan " +
@@ -66,10 +69,13 @@ public class KegiatanSayaController {
                 String namaKegiatan = rs.getString("nama_kegiatan");
                 String namaClub = rs.getString("nama_club");
                 LocalDate tanggal = rs.getObject("tanggal", LocalDate.class);
+                LocalTime waktuMulai = rs.getObject("waktu_mulai", LocalTime.class);
+                LocalTime waktuSelesai = rs.getObject("waktu_selesai", LocalTime.class);
+                String lokasi = rs.getString("lokasi");
                 String statusPresensi = rs.getString("status_presensi");
 
-                // Buat kartu visual untuk setiap kegiatan
-                VBox card = createKegiatanCard(namaKegiatan, namaClub, tanggal, statusPresensi);
+                // Buat kartu visual dengan data yang lebih lengkap
+                VBox card = createKegiatanCard(namaKegiatan, namaClub, tanggal, waktuMulai, waktuSelesai, lokasi, statusPresensi);
                 kegiatanContainer.getChildren().add(card);
             }
 
@@ -91,10 +97,10 @@ public class KegiatanSayaController {
      * Membuat satu kartu (VBox) yang menampilkan detail satu riwayat kegiatan.
      * @return VBox yang siap ditampilkan.
      */
-    private VBox createKegiatanCard(String namaKegiatan, String namaClub, LocalDate tanggal, String statusPresensi) {
+    private VBox createKegiatanCard(String namaKegiatan, String namaClub, LocalDate tanggal, LocalTime waktuMulai, LocalTime waktuSelesai, String lokasi, String statusPresensi) {
         VBox card = new VBox(10);
         card.setPadding(new Insets(15));
-        card.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        card.setStyle("-fx-background-color: #008000; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
         // Baris Atas: Nama Kegiatan dan Status Presensi
         HBox topRow = new HBox();
@@ -103,7 +109,6 @@ public class KegiatanSayaController {
         Label namaKegiatanLabel = new Label(namaKegiatan);
         namaKegiatanLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
 
-        // Spacer untuk mendorong status ke kanan
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
@@ -112,7 +117,6 @@ public class KegiatanSayaController {
         statusLabel.setPadding(new Insets(5, 10, 5, 10));
         statusLabel.setStyle("-fx-background-radius: 15;");
 
-        // Atur warna label status berdasarkan isinya
         switch (statusPresensi.toLowerCase()) {
             case "hadir":
                 statusLabel.setStyle(statusLabel.getStyle() + "-fx-background-color: #d4edda; -fx-text-fill: #155724;");
@@ -120,7 +124,7 @@ public class KegiatanSayaController {
             case "tidak hadir":
                 statusLabel.setStyle(statusLabel.getStyle() + "-fx-background-color: #f8d7da; -fx-text-fill: #721c24;");
                 break;
-            default: // "Belum direkap"
+            default:
                 statusLabel.setStyle(statusLabel.getStyle() + "-fx-background-color: #e2e3e5; -fx-text-fill: #383d41;");
                 break;
         }
@@ -129,14 +133,24 @@ public class KegiatanSayaController {
 
         // Informasi Tambahan
         Label clubLabel = new Label("Penyelenggara: " + namaClub);
-        clubLabel.setTextFill(Color.web("#555"));
+        clubLabel.setTextFill(Color.BLACK);
 
-        // Format tanggal agar lebih mudah dibaca
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
-        Label tanggalLabel = new Label("Tanggal: " + tanggal.format(formatter));
-        tanggalLabel.setTextFill(Color.web("#555"));
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
+        Label tanggalLabel = new Label("Tanggal: " + tanggal.format(dateFormatter));
+        tanggalLabel.setTextFill(Color.BLACK);
 
-        card.getChildren().addAll(topRow, clubLabel, tanggalLabel);
+
+        // --- LABEL BARU UNTUK WAKTU DAN RUANGAN ---
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String waktuText = waktuMulai.format(timeFormatter) + " - " + waktuSelesai.format(timeFormatter);
+        Label waktuLabel = new Label("Waktu: " + waktuText);
+        waktuLabel.setTextFill(Color.BLACK);
+
+        Label lokasiLabel = new Label("Ruangan: " + lokasi);
+        lokasiLabel.setTextFill(Color.BLACK);
+
+        // Menambahkan semua label ke dalam kartu
+        card.getChildren().addAll(topRow, clubLabel, tanggalLabel, waktuLabel, lokasiLabel);
         return card;
     }
 }
