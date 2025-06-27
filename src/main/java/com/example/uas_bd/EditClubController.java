@@ -44,8 +44,8 @@ public class EditClubController {
 
     @FXML
     public void initialize() {
-        this.nrp = "c14240058";
-//        this.nrp = UserSession.getLoggedInNrp();
+//        this.nrp = "c14240058";
+        this.nrp = UserSession.getLoggedInNrp();
         loadCategories();
         loadClubs();
     }
