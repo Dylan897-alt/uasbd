@@ -21,12 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * Controller untuk halaman yang menampilkan daftar semua klub yang tersedia.
- * Halaman ini berfungsi sebagai "galeri" atau "katalog" klub.
- */
 public class ClubsController {
-
     @FXML
     private VBox clubsContainer;
 
@@ -35,39 +30,25 @@ public class ClubsController {
         loadClubsFromDatabase();
     }
 
-    /**
-     * Memuat data klub dari database dan secara dinamis membuat elemen UI untuk setiap klub.
-     */
     private void loadClubsFromDatabase() {
         String query = "SELECT id_club, nama_club, deskripsi, tahun_berdiri, image_path FROM club ORDER BY nama_club ASC";
-
-        // --- PENYEMPURNAAN KUNCI ---
-        // Menggunakan try-with-resources untuk Connection, Statement, dan ResultSet.
-        // Ini memastikan semua sumber daya database (conn, stmt, rs) secara otomatis
-        // ditutup setelah blok try selesai, mencegah kebocoran sumber daya (resource leak).
         try (Connection conn = DatabaseConnector.connect();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
-            // Memeriksa apakah koneksi berhasil didapatkan
             if (conn == null) {
                 showError("Kesalahan Database", "Gagal terhubung ke database. Periksa pengaturan koneksi Anda.");
                 return;
             }
-
-            // Loop melalui setiap baris hasil dari database
             while (rs.next()) {
-                // Mengambil data dari setiap kolom
                 int clubID = rs.getInt("id_club");
                 String name = rs.getString("nama_club");
                 String description = rs.getString("deskripsi");
                 int year = rs.getInt("tahun_berdiri");
                 String imagePath = rs.getString("image_path"); // Diasumsikan ada kolom image_path di tabel club
 
-                // Membuat satu baris visual untuk klub
                 HBox clubBox = createClubVisualBox(clubID, name, description, year, imagePath);
 
-                // Menambahkan baris klub yang sudah jadi ke dalam container utama
                 clubsContainer.getChildren().add(clubBox);
             }
 
@@ -77,10 +58,6 @@ public class ClubsController {
         }
     }
 
-    /**
-     * Membuat satu HBox visual yang berisi informasi lengkap untuk satu klub.
-     * @return HBox yang siap ditampilkan.
-     */
     private HBox createClubVisualBox(int clubID, String name, String description, int year, String imagePath) {
         HBox clubBox = new HBox(20); // Memberi jarak 20px antar elemen
         clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: white;");
@@ -116,9 +93,6 @@ public class ClubsController {
         return clubBox;
     }
 
-    /**
-     * Logika untuk berpindah dari halaman ini ke halaman detail klub.
-     */
     private void navigateToClubDetail(int clubID, Node sourceNode) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("club-detail.fxml")); // Pastikan nama file FXML benar
@@ -138,11 +112,6 @@ public class ClubsController {
         }
     }
 
-    /**
-     * Membuat ImageView dari path gambar. Sangat tangguh karena memiliki gambar fallback.
-     * @param imagePath Path relatif gambar dari folder /resources/images/
-     * @return ImageView yang siap digunakan.
-     */
     private ImageView createImageView(String imagePath) {
         InputStream imageStream = null;
 
@@ -167,9 +136,6 @@ public class ClubsController {
         return imageView;
     }
 
-    /**
-     * Helper method untuk menampilkan pesan error.
-     */
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

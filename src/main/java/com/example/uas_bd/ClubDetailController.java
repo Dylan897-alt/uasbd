@@ -17,10 +17,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- * Controller untuk halaman yang menampilkan detail dari satu klub spesifik.
- * Dari sini, pengguna bisa melihat informasi lengkap dan mendaftar sebagai anggota.
- */
 public class ClubDetailController {
 
     @FXML
@@ -37,21 +33,11 @@ public class ClubDetailController {
     private int clubId;
     private String clubName; // Simpan nama klub untuk digunakan di notifikasi
 
-    /**
-     * Metode ini dipanggil oleh ClubsController untuk mengirimkan ID klub yang dipilih.
-     * Ini adalah titik masuk utama untuk controller ini.
-     * @param clubId ID dari klub yang akan ditampilkan.
-     */
     public void initializeClubData(int clubId) {
         this.clubId = clubId;
-        // Setelah ID didapat, muat semua data dari database
         loadClubDetails();
     }
 
-    /**
-     * Memuat semua detail klub dari database (nama, deskripsi, gambar)
-     * dan kemudian memeriksa status keanggotaan pengguna.
-     */
     private void loadClubDetails() {
         String query = "SELECT nama_club, deskripsi, tahun_berdiri, image_path FROM club WHERE id_club = ?";
 
@@ -72,13 +58,11 @@ public class ClubDetailController {
                 int year = rs.getInt("tahun_berdiri");
                 String imagePath = rs.getString("image_path");
 
-                // Setel UI dengan data yang didapat
                 clubNameLabel.setText(this.clubName);
                 clubDescriptionLabel.setText(description);
                 clubYearLabel.setText("Berdiri sejak: " + year);
                 clubImageView.setImage(loadImage(imagePath));
 
-                // Setelah detail klub dimuat, periksa apakah user sudah menjadi anggota
                 checkMembershipStatus();
             } else {
                 showError("Klub Tidak Ditemukan", "Klub dengan ID " + this.clubId + " tidak ditemukan.");
@@ -90,12 +74,7 @@ public class ClubDetailController {
         }
     }
 
-    /**
-     * Memeriksa apakah pengguna yang sedang login sudah menjadi anggota klub ini atau belum,
-     * lalu menampilkan tombol "Daftar" atau label status yang sesuai.
-     */
     private void checkMembershipStatus() {
-        // --- PERBAIKAN PENTING: Gunakan UserSession ---
         String loggedInNrp = UserSession.getLoggedInNrp();
         if (loggedInNrp == null || !UserSession.isLoggedIn()) {
             showError("Sesi Tidak Valid", "Tidak dapat memverifikasi pengguna. Silakan login kembali.");
@@ -121,17 +100,11 @@ public class ClubDetailController {
             return; // Keluar jika terjadi error
         }
 
-        // Tampilkan UI yang sesuai berdasarkan status keanggotaan
         updateActionUI(isMember);
     }
 
-    /**
-     * Memperbarui UI di dalam actionContainer.
-     * @param isMember true jika pengguna adalah anggota, false jika bukan.
-     */
     private void updateActionUI(boolean isMember) {
-        actionContainer.getChildren().clear(); // Bersihkan container sebelum menambahkan elemen baru
-
+        actionContainer.getChildren().clear();
         if (isMember) {
             Label alreadyJoinedLabel = new Label("Anda sudah terdaftar");
             alreadyJoinedLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: green;");
@@ -144,11 +117,7 @@ public class ClubDetailController {
         }
     }
 
-    /**
-     * Dijalankan ketika tombol "Gabung Klub Ini" diklik.
-     */
     private void handleJoinClubAction() {
-        // Tampilkan dialog konfirmasi
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Konfirmasi Pendaftaran");
         confirmation.setHeaderText("Mendaftar ke " + this.clubName);
@@ -156,14 +125,10 @@ public class ClubDetailController {
 
         Optional<ButtonType> result = confirmation.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            // Jika pengguna menekan OK, lanjutkan proses registrasi
             registerUserToClub();
         }
     }
 
-    /**
-     * Proses memasukkan data pendaftaran pengguna ke tabel 'keanggotaan'.
-     */
     private void registerUserToClub() {
         String loggedInNrp = UserSession.getLoggedInNrp();
         if (loggedInNrp == null) {
