@@ -29,26 +29,24 @@ public class ActivityCardController {
     @FXML
     private HBox actionButtonContainer; // Container untuk tombol-tombol
     @FXML
-    private Button detailButton;
-    @FXML
     private Button daftarButton;
     @FXML
     private Button editButton;
     @FXML
     private Button deleteButton;
 
-    // Variabel untuk menyimpan data dan referensi
     private Kegiatan kegiatan;
     private KegiatanListController parentController;
 
     /**
      * Metode utama untuk mengisi data ke dalam kartu.
-     * Dipanggil dari KegiatanListController saat kartu dibuat.
+     * Menerima parameter boolean 'isRegistered' untuk menentukan tampilan awal.
      * @param kegiatan Objek Kegiatan yang berisi semua data.
      * @param userRole Role dari pengguna yang sedang login ('Anggota' atau 'Pengurus').
      * @param parentController Referensi ke controller utama yang memuat kartu ini.
+     * @param isRegistered Status apakah pengguna sudah terdaftar di kegiatan ini.
      */
-    public void setKegiatanData(Kegiatan kegiatan, String userRole, KegiatanListController parentController) {
+    public void setKegiatanData(Kegiatan kegiatan, String userRole, KegiatanListController parentController, boolean isRegistered) {
         this.kegiatan = kegiatan;
         this.parentController = parentController;
 
@@ -62,24 +60,26 @@ public class ActivityCardController {
 
         // Logika untuk menampilkan tombol yang sesuai berdasarkan peran pengguna
         if ("Anggota".equals(userRole)) {
-            // Aksi untuk Anggota
-            detailButton.setVisible(true);
-            daftarButton.setVisible(true);
+            // Sembunyikan tombol-tombol yang tidak relevan untuk Anggota
             editButton.setVisible(false);
             deleteButton.setVisible(false);
 
-            // Menghubungkan aksi tombol ke metode yang ada di controller utama (parent)
-            detailButton.setOnAction(event -> parentController.handleLihatDetailAnggota(kegiatan));
-            daftarButton.setOnAction(event -> parentController.handleDaftarKegiatan(kegiatan, this));
+            // Logika kunci: Tentukan tampilan berdasarkan status pendaftaran
+            if (isRegistered) {
+                // Jika sudah terdaftar saat halaman dimuat, langsung ubah tampilannya
+                updateToRegisteredState();
+            } else {
+                // Jika belum, tampilkan tombol "Daftar" dan hubungkan aksinya
+                daftarButton.setVisible(true);
+                daftarButton.setOnAction(event -> parentController.handleDaftarKegiatan(kegiatan, this));
+            }
 
         } else if ("Pengurus".equals(userRole)) {
             // Aksi untuk Pengurus
-            detailButton.setVisible(false);
             daftarButton.setVisible(false);
             editButton.setVisible(true);
             deleteButton.setVisible(true);
 
-            // Menghubungkan aksi tombol ke metode yang ada di controller utama (parent)
             editButton.setOnAction(event -> parentController.handleEditKegiatan(kegiatan));
             deleteButton.setOnAction(event -> parentController.handleHapusKegiatan(kegiatan));
         } else {
@@ -89,9 +89,8 @@ public class ActivityCardController {
     }
 
     /**
-     * Metode ini mengubah tampilan kartu setelah pengguna berhasil mendaftar.
-     * Ia akan mengganti tombol-tombol dengan label "Sudah Terdaftar".
-     * Metode ini dipanggil dari KegiatanListController.
+     * Metode ini mengubah tampilan kartu setelah pengguna berhasil mendaftar
+     * atau saat halaman dimuat dan pengguna sudah terdaftar.
      */
     public void updateToRegisteredState() {
         // Hapus semua tombol yang ada di dalam container

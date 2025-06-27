@@ -12,8 +12,7 @@
   Root-nya adalah VBox untuk menata elemen secara vertikal.
   Ukuran prefWidth dan style bisa Anda sesuaikan.
 -->
-
-<VBox prefWidth="350.0" spacing="8.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.uas_bd.ActivityCardController">
+<VBox prefWidth="350.0" spacing="8.0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.uas_bd.ActivityCardController">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
     </padding>
@@ -41,8 +40,8 @@
         <!-- Container untuk tombol-tombol aksi -->
         <HBox fx:id="actionButtonContainer" alignment="CENTER_LEFT" spacing="10.0">
             <children>
-                <Button fx:id="detailButton" mnemonicParsing="false" text="Lihat Detail" />
-                <Button fx:id="daftarButton" mnemonicParsing="false" style="-fx-background-color: 7CFC00;" text="Daftar" />
+                <!-- Tombol "Lihat Detail" sudah dihapus -->
+                <Button fx:id="daftarButton" mnemonicParsing="false" text="Daftar" />
                 <Button fx:id="editButton" mnemonicParsing="false" text="Edit" />
                 <Button fx:id="deleteButton" mnemonicParsing="false" text="Hapus" />
             </children>
