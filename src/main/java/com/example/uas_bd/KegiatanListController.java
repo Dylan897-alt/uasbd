@@ -31,8 +31,6 @@ public class KegiatanListController {
     @FXML
     private Button resetFilterButton;
     @FXML
-    private Button addKegiatanButton;
-    @FXML
     private FlowPane kegiatanFlowPane;
 
     private ObservableList<Kegiatan> masterKegiatanList = FXCollections.observableArrayList();
@@ -42,8 +40,6 @@ public class KegiatanListController {
     @FXML
     public void initialize() {
         String currentUserRole = UserSession.getLoggedInRole();
-        addKegiatanButton.setVisible("Pengurus".equals(currentUserRole));
-        addKegiatanButton.setOnAction(event -> handleTambahKegiatan());
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> filterKegiatanData());
         jenisKegiatanFilterComboBox.valueProperty().addListener((obs, oldVal, newVal) -> filterKegiatanData());
@@ -69,8 +65,7 @@ public class KegiatanListController {
                 registeredActivityIds.add(rs.getInt("id_kegiatan"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat status pendaftaran Anda.");
+            showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat status pendaftaran Anda.\n\n" + getErrorMessage(e));
         }
 
         String kegiatanQuery = "SELECT kc.id_kegiatan, kc.nama_kegiatan, c.nama_club, kc.tanggal, " +
@@ -94,8 +89,7 @@ public class KegiatanListController {
                 ));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat data kegiatan.");
+            showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat data kegiatan.\n\n" + getErrorMessage(e));
         }
 
         filterKegiatanData();
@@ -117,8 +111,7 @@ public class KegiatanListController {
                     cardController.setKegiatanData(kegiatan, currentUserRole, this, isRegistered);
                     kegiatanFlowPane.getChildren().add(cardNode);
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    showAlert(AlertType.ERROR, "Kesalahan UI", "Gagal memuat kartu kegiatan.");
+                    showAlert(AlertType.ERROR, "Kesalahan UI", "Gagal memuat kartu kegiatan.\n\n" + getErrorMessage(e));
                 }
             }
         }
@@ -155,17 +148,14 @@ public class KegiatanListController {
                 registeredActivityIds.add(idKegiatan);
             }
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23505")) {
+            if ("23505".equals(e.getSQLState())) {
                 showAlert(AlertType.WARNING, "Gagal", "Anda sudah pernah terdaftar di kegiatan ini.");
                 cardController.updateToRegisteredState();
             } else {
-                e.printStackTrace();
-                showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal mendaftar: " + e.getMessage());
+                showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal mendaftar: " + getErrorMessage(e));
             }
         }
     }
-
-    // --- Implementasi Metode yang Sebelumnya Kosong ---
 
     private void loadFilterOptions() {
         ObservableList<String> jenisList = FXCollections.observableArrayList();
@@ -179,7 +169,7 @@ public class KegiatanListController {
             jenisKegiatanFilterComboBox.setItems(jenisList);
             jenisKegiatanFilterComboBox.getSelectionModel().selectFirst();
         } catch (SQLException e) {
-            e.printStackTrace();
+            showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat filter jenis kegiatan.\n\n" + getErrorMessage(e));
         }
 
         ObservableList<String> clubList = FXCollections.observableArrayList();
@@ -193,7 +183,7 @@ public class KegiatanListController {
             clubFilterComboBox.setItems(clubList);
             clubFilterComboBox.getSelectionModel().selectFirst();
         } catch (SQLException e) {
-            e.printStackTrace();
+            showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat filter club.\n\n" + getErrorMessage(e));
         }
     }
 
@@ -221,11 +211,6 @@ public class KegiatanListController {
         clubFilterComboBox.getSelectionModel().selectFirst();
     }
 
-    public void handleLihatDetailAnggota(Kegiatan kegiatan) {
-        // Implementasi navigasi ke halaman detail
-        System.out.println("Melihat detail: " + kegiatan.getNamaKegiatan());
-    }
-
     public void handleEditKegiatan(Kegiatan kegiatan) {
         // Implementasi navigasi ke halaman edit untuk Pengurus
         System.out.println("Mengedit: " + kegiatan.getNamaKegiatan());
@@ -236,16 +221,17 @@ public class KegiatanListController {
         System.out.println("Menghapus: " + kegiatan.getNamaKegiatan());
     }
 
-    public void handleTambahKegiatan() {
-        // Implementasi navigasi ke halaman tambah kegiatan untuk Pengurus
-        System.out.println("Navigasi ke halaman tambah kegiatan...");
-    }
-
     private void showAlert(AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String getErrorMessage(Exception e) {
+        return (e.getMessage() != null && !e.getMessage().isBlank())
+                ? e.getMessage()
+                : "Terjadi kesalahan tak dikenal.";
     }
 }

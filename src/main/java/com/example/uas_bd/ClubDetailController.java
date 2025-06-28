@@ -69,7 +69,6 @@ public class ClubDetailController {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             showError("Kesalahan Database", "Gagal memuat detail klub: " + e.getMessage());
         }
     }
@@ -95,9 +94,8 @@ public class ClubDetailController {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             showError("Kesalahan Database", "Gagal memeriksa status keanggotaan: " + e.getMessage());
-            return; // Keluar jika terjadi error
+            return;
         }
 
         updateActionUI(isMember);
@@ -151,7 +149,7 @@ public class ClubDetailController {
 
             if (affectedRows > 0) {
                 showAlert(Alert.AlertType.INFORMATION, "Pendaftaran Berhasil!", "Selamat! Anda telah berhasil terdaftar di " + this.clubName + ".");
-                // Perbarui UI untuk menampilkan status "Sudah terdaftar"
+                showAlert(Alert.AlertType.INFORMATION, "Pendaftaran Berhasil!", "Selamat! Anda telah berhasil terdaftar di " + this.clubName + ".");
                 updateActionUI(true);
             }
 
@@ -160,7 +158,6 @@ public class ClubDetailController {
                 showError("Pendaftaran Gagal", "Anda sudah terdaftar di klub ini.");
                 updateActionUI(true); // Perbarui UI juga jika ternyata sudah terdaftar
             } else {
-                e.printStackTrace();
                 showError("Kesalahan Registrasi", "Terjadi kesalahan database: " + e.getMessage());
             }
         }

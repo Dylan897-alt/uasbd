@@ -87,7 +87,6 @@ public class KegiatanSayaController {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             Label dbErrorLabel = new Label("Gagal memuat riwayat kegiatan: Kesalahan database.");
             kegiatanContainer.getChildren().add(dbErrorLabel);
         }

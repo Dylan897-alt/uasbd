@@ -22,7 +22,6 @@ public class DatabaseConnector {
         try {
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
-            System.err.println("Connection failed: " + e.getMessage());
             return null;
         }
     }

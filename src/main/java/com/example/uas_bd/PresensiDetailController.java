@@ -5,7 +5,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,11 +51,10 @@ public class PresensiDetailController {
             while (rs.next()) {
                 rows.add(new PresensiRow(rs.getString("nrp"), rs.getString("nama")));
             }
+            tableView.setItems(rows);
         } catch (SQLException e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Kesalahan Database", "Gagal memuat daftar registrasi.\n\n" + getErrorMessage(e));
         }
-
-        tableView.setItems(rows);
     }
 
     @FXML
@@ -100,13 +98,29 @@ public class PresensiDetailController {
                     insertStmt.setInt(4, idRegistrasi);
 
                     insertStmt.executeUpdate();
+                } catch (SQLException e) {
+                    showAlert(Alert.AlertType.ERROR, "Kesalahan Database", "Gagal menyimpan presensi.\n\n" + getErrorMessage(e));
                 }
             } else {
-                System.err.println("Registrasi not found for NRP: " + nrp + ", kegiatanId: " + kegiatanId);
+                showAlert(Alert.AlertType.WARNING, "Data Tidak Ditemukan", "Registrasi tidak ditemukan untuk:\nNRP: " + nrp + "\nKegiatan ID: " + kegiatanId);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Kesalahan Database", "Gagal mengambil ID registrasi.\n\n" + getErrorMessage(e));
         }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private String getErrorMessage(Exception e) {
+        return (e.getMessage() != null && !e.getMessage().isBlank())
+                ? e.getMessage()
+                : "Terjadi kesalahan tak dikenal.";
     }
 }

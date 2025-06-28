@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
@@ -33,7 +34,7 @@ public class PengurusDashboardController {
                 }
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                showErrorPopup("Kesalahan database", e.getMessage());
                 welcomeLabel.setText("Selamat datang, Pengurus!");
             }
         }
@@ -58,7 +59,15 @@ public class PengurusDashboardController {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            showErrorPopup("Kesalahan memuat halaman", e.getMessage());
         }
+    }
+
+    private void showErrorPopup(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Kesalahan");
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

@@ -80,7 +80,6 @@ public class SignUpController {
             }
             prodiComboBox.setItems(prodiList);
         } catch (SQLException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat data Program Studi: " + e.getMessage());
         }
     }
@@ -95,7 +94,6 @@ public class SignUpController {
             }
             programComboBox.setItems(programList);
         } catch (SQLException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal memuat data Program Mahasiswa: " + e.getMessage());
         }
     }
@@ -168,7 +166,6 @@ public class SignUpController {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             if (e.getMessage().contains("duplicate key value violates unique constraint \"mahasiswa_nrp_pkey\"")) {
                 showAlert(AlertType.ERROR, "Pendaftaran Gagal", "NRP '" + nrp + "' sudah terdaftar. Mohon gunakan NRP lain.");
             } else if (e.getMessage().contains("duplicate key value violates unique constraint \"mahasiswa_email_key\"")) {
@@ -191,7 +188,6 @@ public class SignUpController {
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Navigasi", "Gagal memuat halaman Login.");
         }
     }
@@ -206,7 +202,6 @@ public class SignUpController {
                 id = rs.getString("id_prodi");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal mendapatkan ID Prodi: " + e.getMessage());
         }
         return id;
@@ -222,7 +217,6 @@ public class SignUpController {
                 id = rs.getString("id_program");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Database", "Gagal mendapatkan ID Program: " + e.getMessage());
         }
         return id;

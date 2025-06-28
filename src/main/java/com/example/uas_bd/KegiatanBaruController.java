@@ -12,52 +12,32 @@ import java.time.format.DateTimeParseException;
 
 public class KegiatanBaruController {
 
-    // --- Elemen FXML dari UI ---
-    @FXML
-    private TextField namaKegiatanField;
-    @FXML
-    private TextField lokasiField;
-    @FXML
-    private DatePicker tanggalPicker;
-    @FXML
-    private TextField waktuMulaiField;
-    @FXML
-    private TextField waktuSelesaiField;
-    @FXML
-    private Button simpanButton;
-    @FXML
-    private ComboBox<Club> clubComboBox;
-    @FXML
-    private ComboBox<JenisKegiatan> jenisKegiatanComboBox;
-    @FXML
-    private Label validationLabel;
-    @FXML
-    private VBox rootVBox; // fx:id untuk root VBox
+    @FXML private TextField namaKegiatanField;
+    @FXML private TextField lokasiField;
+    @FXML private DatePicker tanggalPicker;
+    @FXML private TextField waktuMulaiField;
+    @FXML private TextField waktuSelesaiField;
+    @FXML private Button simpanButton;
+    @FXML private ComboBox<Club> clubComboBox;
+    @FXML private ComboBox<JenisKegiatan> jenisKegiatanComboBox;
+    @FXML private Label validationLabel;
+    @FXML private VBox rootVBox;
 
     @FXML
     public void initialize() {
-        // Atur label validasi agar tidak terlihat dan tidak memakan tempat
         validationLabel.setVisible(false);
         validationLabel.setManaged(false);
 
-        // Validasi hak akses. Hanya 'Pengurus' yang boleh mengakses halaman ini.
         if (!"Pengurus".equals(UserSession.getLoggedInRole())) {
             showError("Akses Ditolak", "Hanya pengurus yang dapat menambah kegiatan baru.");
-            // Nonaktifkan seluruh form jika pengguna bukan pengurus
-            if (rootVBox != null) {
-                rootVBox.setDisable(true);
-            }
+            if (rootVBox != null) rootVBox.setDisable(true);
             return;
         }
 
-        // Muat data awal untuk ComboBox
         loadClubs();
         loadJenisKegiatan();
     }
 
-    /**
-     * Memuat daftar klub dari database ke dalam clubComboBox.
-     */
     private void loadClubs() {
         ObservableList<Club> clubs = FXCollections.observableArrayList();
         String query = "SELECT id_club, nama_club FROM club ORDER BY nama_club ASC";
@@ -72,14 +52,10 @@ public class KegiatanBaruController {
             clubComboBox.setItems(clubs);
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            showError("Kesalahan Database", "Gagal memuat daftar klub: " + e.getMessage());
+            showError("Kesalahan Database", "Gagal memuat daftar klub.\n\n" + getErrorMessage(e));
         }
     }
 
-    /**
-     * Memuat daftar jenis kegiatan dari database ke dalam jenisKegiatanComboBox.
-     */
     private void loadJenisKegiatan() {
         ObservableList<JenisKegiatan> jenisList = FXCollections.observableArrayList();
         String query = "SELECT id_jenis, nama_jenis FROM jenis_kegiatan ORDER BY nama_jenis ASC";
@@ -94,29 +70,21 @@ public class KegiatanBaruController {
             jenisKegiatanComboBox.setItems(jenisList);
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            showError("Kesalahan Database", "Gagal memuat jenis kegiatan: " + e.getMessage());
+            showError("Kesalahan Database", "Gagal memuat jenis kegiatan.\n\n" + getErrorMessage(e));
         }
     }
 
-    /**
-     * Dijalankan saat tombol "Simpan Kegiatan" diklik.
-     * Mengelola validasi input sebelum menyimpan.
-     */
     @FXML
     private void handleSimpanKegiatanAction() {
-        // Sembunyikan label error setiap kali tombol diklik
         validationLabel.setVisible(false);
         validationLabel.setManaged(false);
 
-        // 1. Validasi field kosong
         if (isAnyFieldEmpty()) {
             showValidationError("Semua field wajib diisi.");
             return;
         }
 
         try {
-            // 2. Validasi format waktu dan logika waktu
             LocalTime waktuMulai = LocalTime.parse(waktuMulaiField.getText());
             LocalTime waktuSelesai = LocalTime.parse(waktuSelesaiField.getText());
 
@@ -125,18 +93,15 @@ public class KegiatanBaruController {
                 return;
             }
 
-            // 3. Jika semua validasi lolos, lanjutkan proses penyimpanan ke database
             saveKegiatanToDatabase(waktuMulai, waktuSelesai);
 
         } catch (DateTimeParseException e) {
-            // Tangani jika format waktu salah (bukan HH:mm)
             showValidationError("Format waktu salah. Gunakan HH:mm (contoh: 14:30).");
+        } catch (Exception e) {
+            showError("Kesalahan Tak Terduga", getErrorMessage(e));
         }
     }
 
-    /**
-     * Menyimpan data kegiatan ke dalam database.
-     */
     private void saveKegiatanToDatabase(LocalTime waktuMulai, LocalTime waktuSelesai) {
         String query = "INSERT INTO kegiatan_club (nama_kegiatan, lokasi, tanggal, waktu_mulai, waktu_selesai, id_club, id_jenis) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -156,19 +121,14 @@ public class KegiatanBaruController {
 
             if (affectedRows > 0) {
                 showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Kegiatan baru berhasil disimpan!");
-                clearForm(); // Kosongkan form setelah berhasil
+                clearForm();
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            showError("Kesalahan Database", "Terjadi error saat menyimpan: " + e.getMessage());
+            showError("Kesalahan Database", "Terjadi kesalahan saat menyimpan.\n\n" + getErrorMessage(e));
         }
     }
 
-    /**
-     * Memeriksa apakah ada field input yang masih kosong.
-     * @return true jika ada field yang kosong.
-     */
     private boolean isAnyFieldEmpty() {
         return namaKegiatanField.getText().trim().isEmpty() ||
                 lokasiField.getText().trim().isEmpty() ||
@@ -179,19 +139,12 @@ public class KegiatanBaruController {
                 jenisKegiatanComboBox.getValue() == null;
     }
 
-    /**
-     * Menampilkan pesan error validasi langsung di UI menggunakan Label.
-     * @param message Pesan error yang akan ditampilkan.
-     */
     private void showValidationError(String message) {
         validationLabel.setText(message);
         validationLabel.setVisible(true);
         validationLabel.setManaged(true);
     }
 
-    /**
-     * Membersihkan semua input field di form.
-     */
     private void clearForm() {
         namaKegiatanField.clear();
         lokasiField.clear();
@@ -202,7 +155,6 @@ public class KegiatanBaruController {
         jenisKegiatanComboBox.getSelectionModel().clearSelection();
     }
 
-    // Helper methods untuk menampilkan dialog Alert
     private void showError(String title, String message) {
         showAlert(Alert.AlertType.ERROR, title, message);
     }
@@ -215,7 +167,11 @@ public class KegiatanBaruController {
         alert.showAndWait();
     }
 
-    // --- Kelas inner untuk ComboBox ---
+    private String getErrorMessage(Exception e) {
+        String msg = e.getMessage();
+        return (msg != null && !msg.isBlank()) ? msg : "Terjadi kesalahan tidak diketahui.";
+    }
+
     public static class Club {
         private final int id;
         private final String nama;

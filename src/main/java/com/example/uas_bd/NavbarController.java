@@ -50,7 +50,7 @@ public class NavbarController {
                 try {
                     switchScene(event, "login.fxml");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
         });

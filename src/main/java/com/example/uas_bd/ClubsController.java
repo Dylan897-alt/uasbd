@@ -45,35 +45,29 @@ public class ClubsController {
                 String name = rs.getString("nama_club");
                 String description = rs.getString("deskripsi");
                 int year = rs.getInt("tahun_berdiri");
-                String imagePath = rs.getString("image_path"); // Diasumsikan ada kolom image_path di tabel club
-
+                String imagePath = rs.getString("image_path");
                 HBox clubBox = createClubVisualBox(clubID, name, description, year, imagePath);
 
                 clubsContainer.getChildren().add(clubBox);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             showError("Kesalahan Database", "Terjadi kesalahan saat memuat data klub: " + e.getMessage());
         }
     }
 
     private HBox createClubVisualBox(int clubID, String name, String description, int year, String imagePath) {
-        HBox clubBox = new HBox(20); // Memberi jarak 20px antar elemen
+        HBox clubBox = new HBox(20);
         clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: white;");
         clubBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Event handler saat sebuah klub di-klik: navigasi ke halaman detail
         clubBox.setOnMouseClicked(event -> navigateToClubDetail(clubID, (Node) event.getSource()));
 
-        // Efek visual saat mouse hover untuk memberikan feedback ke pengguna
         clubBox.setOnMouseEntered(e -> clubBox.setStyle("-fx-border-color: #0078D7; -fx-border-width: 2; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: #f0f8ff; -fx-effect: dropshadow(three-pass-box, rgba(0,120,215,0.3), 10, 0, 0, 0);"));
         clubBox.setOnMouseExited(e -> clubBox.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8; -fx-padding: 15; -fx-background-color: white;"));
 
-        // Membuat dan menambahkan gambar/logo klub
         clubBox.getChildren().add(createImageView(imagePath));
 
-        // Membuat container untuk teks (nama, deskripsi, tahun)
         VBox textContainer = new VBox(5);
         textContainer.setAlignment(Pos.CENTER_LEFT);
 
@@ -95,19 +89,17 @@ public class ClubsController {
 
     private void navigateToClubDetail(int clubID, Node sourceNode) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("club-detail.fxml")); // Pastikan nama file FXML benar
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("club-detail.fxml"));
             Parent root = loader.load();
 
-            // Mengambil controller dari halaman detail untuk mengirimkan ID klub
             ClubDetailController controller = loader.getController();
-            controller.initializeClubData(clubID); // Metode baru untuk mengirim ID
+            controller.initializeClubData(clubID);
 
             Stage stage = (Stage) sourceNode.getScene().getWindow();
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
             showError("Kesalahan Navigasi", "Gagal memuat halaman detail klub: " + e.getMessage());
         }
     }
@@ -115,7 +107,6 @@ public class ClubsController {
     private ImageView createImageView(String imagePath) {
         InputStream imageStream = null;
 
-        // Coba muat gambar spesifik klub
         if (imagePath != null && !imagePath.trim().isEmpty()) {
             imageStream = getClass().getResourceAsStream("/images/" + imagePath);
         }
@@ -124,7 +115,6 @@ public class ClubsController {
         if (imageStream == null) {
             imageStream = getClass().getResourceAsStream("/images/image-not-found.png");
             if (imageStream == null) {
-                // Jika gambar fallback pun tidak ada, ini adalah error kritis
                 throw new RuntimeException("Krisis! Gambar fallback 'image-not-found.png' tidak ditemukan di resources/images.");
             }
         }

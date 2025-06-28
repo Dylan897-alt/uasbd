@@ -133,7 +133,6 @@ public class LoginController {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Database", "Terjadi kesalahan saat login: " + e.getMessage());
         }
     }
@@ -149,7 +148,6 @@ public class LoginController {
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Navigasi", "Gagal memuat halaman Sign Up.");
         }
     }
@@ -182,7 +180,6 @@ public class LoginController {
                 showAlert(AlertType.ERROR, "Navigasi", "Tidak ada dashboard yang ditentukan untuk role ini.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
             showAlert(AlertType.ERROR, "Kesalahan Navigasi", "Gagal memuat dashboard: " + e.getMessage());
         }
     }

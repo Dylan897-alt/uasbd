@@ -1,8 +1,13 @@
 package com.example.uas_bd;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ProfileController {
 
@@ -46,8 +51,19 @@ public class ProfileController {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            showErrorAlert("Terjadi kesalahan saat mengambil data", e.getMessage());
             nrpLabel.setText("Terjadi kesalahan saat mengambil data.");
+        } catch (Exception e) {
+            showErrorAlert("Kesalahan tidak terduga", e.getMessage());
+            nrpLabel.setText("Terjadi kesalahan.");
         }
+    }
+
+    private void showErrorAlert(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

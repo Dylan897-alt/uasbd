@@ -7,13 +7,7 @@ import javafx.scene.layout.HBox;
 
 import java.time.format.DateTimeFormatter;
 
-/**
- * Controller untuk satu kartu kegiatan (ActivityCard.fxml).
- * Mengelola tampilan dan aksi dari satu item kegiatan di dalam daftar.
- */
 public class ActivityCardController {
-
-    // Elemen-elemen FXML yang di-inject dari ActivityCard.fxml
     @FXML
     private Label namaKegiatanLabel;
     @FXML
@@ -38,14 +32,6 @@ public class ActivityCardController {
     private Kegiatan kegiatan;
     private KegiatanListController parentController;
 
-    /**
-     * Metode utama untuk mengisi data ke dalam kartu.
-     * Menerima parameter boolean 'isRegistered' untuk menentukan tampilan awal.
-     * @param kegiatan Objek Kegiatan yang berisi semua data.
-     * @param userRole Role dari pengguna yang sedang login ('Anggota' atau 'Pengurus').
-     * @param parentController Referensi ke controller utama yang memuat kartu ini.
-     * @param isRegistered Status apakah pengguna sudah terdaftar di kegiatan ini.
-     */
     public void setKegiatanData(Kegiatan kegiatan, String userRole, KegiatanListController parentController, boolean isRegistered) {
         this.kegiatan = kegiatan;
         this.parentController = parentController;
@@ -64,18 +50,14 @@ public class ActivityCardController {
             editButton.setVisible(false);
             deleteButton.setVisible(false);
 
-            // Logika kunci: Tentukan tampilan berdasarkan status pendaftaran
             if (isRegistered) {
-                // Jika sudah terdaftar saat halaman dimuat, langsung ubah tampilannya
                 updateToRegisteredState();
             } else {
-                // Jika belum, tampilkan tombol "Daftar" dan hubungkan aksinya
                 daftarButton.setVisible(true);
                 daftarButton.setOnAction(event -> parentController.handleDaftarKegiatan(kegiatan, this));
             }
 
         } else if ("Pengurus".equals(userRole)) {
-            // Aksi untuk Pengurus
             daftarButton.setVisible(false);
             editButton.setVisible(true);
             deleteButton.setVisible(true);
@@ -88,10 +70,6 @@ public class ActivityCardController {
         }
     }
 
-    /**
-     * Metode ini mengubah tampilan kartu setelah pengguna berhasil mendaftar
-     * atau saat halaman dimuat dan pengguna sudah terdaftar.
-     */
     public void updateToRegisteredState() {
         // Hapus semua tombol yang ada di dalam container
         actionButtonContainer.getChildren().clear();

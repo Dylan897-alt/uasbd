@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -13,15 +14,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import com.example.uas_bd.PresensiDetailController;
-
-
 
 public class ManagePresensiController {
     @FXML
     private VBox kegiatanContainer;
 
-    @FXML public void initialize() {
+    @FXML
+    public void initialize() {
         loadKegiatanList();
     }
 
@@ -30,6 +29,7 @@ public class ManagePresensiController {
         try (Connection conn = DatabaseConnector.connect();
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 int id = rs.getInt("id_kegiatan");
                 String nama = rs.getString("nama_kegiatan");
@@ -38,23 +38,37 @@ public class ManagePresensiController {
                 btn.setOnAction(e -> openPresensiDetailPage(id));
                 kegiatanContainer.getChildren().add(btn);
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Kesalahan Database", "Gagal memuat daftar kegiatan.\n\n" + getErrorMessage(e));
         }
     }
 
     private void openPresensiDetailPage(int idKegiatan) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("presensi-detail.fxml"));
-            Parent root = loader.load(); // ini WAJIB
-            PresensiDetailController controller = loader.getController(); // baru ini bisa
+            Parent root = loader.load();
+            PresensiDetailController controller = loader.getController();
             controller.setKegiatanId(idKegiatan);
 
             Stage stage = (Stage) kegiatanContainer.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Kesalahan UI", "Gagal membuka halaman presensi.\n\n" + getErrorMessage(e));
         }
     }
 
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private String getErrorMessage(Exception e) {
+        return (e.getMessage() != null && !e.getMessage().isBlank())
+                ? e.getMessage()
+                : "Terjadi kesalahan tak dikenal.";
+    }
 }
